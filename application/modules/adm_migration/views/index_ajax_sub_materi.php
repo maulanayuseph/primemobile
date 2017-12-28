@@ -9,7 +9,7 @@
 	<input type="text" id="proof-bab" class="form-control" value="<?php echo $valuebab;?>">
 </div>
 <div class="col-md-4">
-	<button class="btn btn-sm btn-success" id="buat-bab" style="width: 100%;">Buat Bab >></button>
+	<button class="btn btn-sm btn-success" id="buat-bab" style="width: 100%;">Transfer Bab >></button>
 </div>
 
 <div class="clearfix">

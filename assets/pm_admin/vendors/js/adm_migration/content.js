@@ -63,9 +63,29 @@ $(function(){
 		}
 	})
 
-
 	$('#sub-materi-old').on('click', '#buat-bab', function(){
-		
+		idkelas 		= $("#kelas-new").val();
+		idkurikulum		= $("#kurikulum-new").val();
+		idmapel 		= $("#mapel-new").val();
+		bab 			= $("#proof-bab").val();
+		idmapok 		= $("#mapok-old").val();
+
+		if(idkelas !== "" && idkurikulum !== "" && idmapel !== "" && idmapok !== ""){
+			$.ajax({
+				type: 'POST',
+				url: 'ajax_cek_transfer_bab',
+				data:{
+					'key'			: key,
+					'idkelas'		: idkelas,
+					'idkurikulum'	: idkurikulum,
+					'idmapel'		: idmapel,
+					'bab'			: bab,
+					'idmapok'		: idmapok
+				}
+			})
+		}else{
+			alert("Pilih Kelas, Kurikulum dan Mapel tujuan sebelum membuat bab baru");
+		}
 	})
 
 	$(document).ajaxSend(function(event, jqxhr, settings){
@@ -92,6 +112,11 @@ $(function(){
 		}
 		if(options.url === "ajax_sub_materi"){
 			$("#sub-materi-old").html(request.responseText);
+		}
+		if(options.url === "ajax_cek_transfer_bab"){
+			$("#mainmodal").modal("show");
+			$("#mainmodaltitle").html("Konfirmasi Transfer Bab");
+			$("#mainmodalcontent").html(request.responseText);
 		}
 	});
 	$(document).ajaxError(function(event, request, options){

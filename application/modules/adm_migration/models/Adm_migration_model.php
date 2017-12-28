@@ -127,6 +127,33 @@ function fetch_mapok_by_id($idmapok){
 	$query = $this->db->get();
 	return $query->row();
 }
+
+function fetch_kelas_by_id($idkelas){
+	$this->db->select("*");
+	$this->db->from("kelas");
+	$this->db->where("id_kelas", $idkelas);
+
+	$query = $this->db->get();
+	return $query->row();
+}
+
+function fetch_kurikulum_by_id($idkurikulum){
+	$this->db->select("*");
+	$this->db->from("kurikulum");
+	$this->db->where("id_kurikulum", $idkurikulum);
+
+	$query = $this->db->get();
+	return $query->row();
+}
+
+function fetch_mapel_new_by_id($idmapel){
+	$this->db->select("*");
+	$this->db->from("mapel");
+	$this->db->where("id_mapel", $idmapel);
+
+	$query = $this->db->get();
+	return $query->row();
+}
 }
 
 ?>

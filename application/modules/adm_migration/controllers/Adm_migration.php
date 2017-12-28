@@ -113,5 +113,27 @@ function ajax_sub_materi(){
 	$this->load->view('adm_migration/index_ajax_sub_materi', $data);
 }
 
+function ajax_cek_transfer_bab(){
+	$params 		= $this->input->post(null, true);
+	$idkelas		= $params['idkelas'];
+	$idkurikulum	= $params['idkurikulum'];
+	$idmapel		= $params['idmapel'];
+	$bab			= $params['bab'];
+	$idmapok 		= $params['idmapok'];
+
+	$data = array(
+		'kelas'			=> $this->adm_migration_model->fetch_kelas_by_id($idkelas),
+		'kurikulum'		=> $this->adm_migration_model->fetch_kurikulum_by_id($idkurikulum),
+		'mapel'			=> $this->adm_migration_model->fetch_mapel_new_by_id($idmapel),
+		'bab'			=> $bab,
+		'mapok'			=> $this->adm_migration_model->fetch_mapok_by_id($idmapok)
+	);
+	$this->load->view("adm_migration/index_ajax_cek_transfer_bab");
+}
+
+function proses_transfer_bab(){
+	
+}
+
 }
 ?>
