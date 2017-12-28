@@ -1,0 +1,23 @@
+<script src="//content.jwplatform.com/libraries/DbXZPMBQ.js"></script>
+<script src="https://developer.jwplayer.com/js/developer.js"></script>
+<div id="stream-tester-player-https"></div>
+<script>
+jwplayer("stream-tester-player-https").setup({
+  "playlist": [
+    {
+      "sources": [
+        {
+          "default": false,
+          "file": "http://stream.primemobile.co.id:1935/TestVOD/_definst_/smil:SEMESTER 2/SMP/Kelas 7/MATEMATIKA/BAB 11/MTK7-11.01.smil/playlist.m3u8",
+          "label": "0",
+          "type": "hls",
+          "preload": "none"
+        }
+      ]
+    }
+  ],
+  "primary": "html5",
+  "hlshtml": true
+});
+
+</script>
