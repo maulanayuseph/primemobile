@@ -1,0 +1,2 @@
+[30-Jan-2017 04:55:13 UTC] PHP Fatal error:  Call to undefined function mb_internal_encoding() in /home/primemobile/public_html/assets/js/plugins/filemanager/config/config.php on line 4
+[02-Feb-2017 14:09:45 UTC] PHP Fatal error:  Call to undefined function mb_internal_encoding() in /home/primemobile/public_html/assets/js/plugins/filemanager/config/config.php on line 4

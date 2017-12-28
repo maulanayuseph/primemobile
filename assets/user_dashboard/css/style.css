@@ -1,0 +1,153 @@
+body{
+	/*
+	background-color: #FF6961;
+	background-color: #1e90ff;
+	*/
+	background-image: url("../images/bg-dot.png");
+	background-image: url(https://kelas.ruangguru.com/images/teacher-bg.svg);
+	background-size: cover;
+	background-attachment: fixed;
+	/*
+	background-size: 8px 8px;
+	*/
+}
+
+.navbar-light .navbar-nav .nav-link{
+	font-size: 18px;
+	color: #ad1f2c;
+}
+.nav-link{
+	font-size: 18px;
+	color: #ad1f2c;
+}
+
+.nav-link:focus, .nav-link:hover{
+	color: black;
+}
+
+.thumbnail-menu{
+	height: 35px;
+	border-radius: 100%;
+}
+
+.kontainer-utama{
+	margin-top: 100px;
+	padding-bottom: 100px;
+}
+
+.col-banner-user{
+	height: 250px;
+	background-color: #d6d6d6;
+	border-radius: 10px 10px 0px 0px;
+	background-size: cover;
+	background-position: center;
+}
+
+.col-bottom-banner{
+	height: 60px;
+	background-color: white;
+	box-shadow: 0 1px 3px 0 rgba(0,0,0,0.25);
+}
+
+.ProfileCanopy-avatar {
+    bottom: -87px;
+    left: 50px;
+    position: absolute;
+    transition: bottom .3s;
+    z-index: 3;
+}
+
+.ProfileAvatar {
+    background: #fff;
+    border: 5px solid #fff;
+    border-radius: 50%;
+    height: 200px;
+    position: relative;
+    width: 200px;
+}
+
+.ProfileAvatar-image, .ProfileAvatar-placeholderImage {
+    -moz-force-broken-image-icon: 1;
+    border-radius: 50%;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.row-materi{
+	margin-top: 40px;
+}
+
+.left-col{
+	padding-bottom: 20px;
+}
+
+.col-bio{
+	padding-top: 10px;
+	margin-bottom: 20px;
+}
+.col-bio .nama{
+	font-weight: bold;
+}
+.col-bio .bio-desc{
+	color: #adadad;
+	margin-bottom: 10px;
+}
+.col-bio .bio-desc i{
+	width: 20px;
+}
+
+.left-col{
+	background-color: white;
+}
+
+.left-col .nav .nav-item i{
+	width: 30px;
+}
+
+.left-col .nav .nav-item a{
+	font-size: 15px;
+}
+
+.right-col{
+	height: 400px;
+	background-color: white;
+}
+
+.center-col{
+	background-color: white;
+	height: 400px;
+}
+
+.right-col{
+	background-color: white;
+	height: 400px;
+}
+
+.badge-primary {
+    color: #fff;
+    background-color: #ad1f2c;
+}
+
+.center-col .card-header h5{
+	color: #ad1f2c;
+}
+
+.right-col .card-header h5{
+	color: #ad1f2c;
+}
+
+.card-body-materi{
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
+.card-body-materi .tab-content .tab-pane{
+	padding: 20px;
+}
+
+.card-body-materi .list-group-item{
+	border: none;
+}
