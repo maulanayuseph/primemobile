@@ -20,7 +20,7 @@
     <?php
       $this->load->view($footerassets);
     ?>
-<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="mainmodal" id="mainmodal" data-backdrop="static">
+<div class="modal bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="mainmodal" id="mainmodal" data-backdrop="static">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
     <div class="modal-header">
@@ -59,7 +59,7 @@
 </button>
 
 <!-- Modal untuk error ajax -->
-<div class="modal fade" id="modal-error" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
+<div class="modal" id="modal-error" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-body text-center">
