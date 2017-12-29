@@ -15,11 +15,6 @@
         <?php
     }
 ?>
-  
-  
-    <?php
-      $this->load->view($footerassets);
-    ?>
 <div class="modal bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="mainmodal" id="mainmodal" data-backdrop="static">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
@@ -71,5 +66,8 @@
     </div>
   </div>
 </div>
+<?php
+  $this->load->view($footerassets);
+?>
   </body>
 </html>

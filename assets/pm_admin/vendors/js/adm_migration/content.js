@@ -65,6 +65,7 @@ $(function(){
 
 	$('#sub-materi-old').on('click', '#buat-bab', function(){
 		idkelas 		= $("#kelas-new").val();
+		kurikulumold 	= $("#kurikulum-old").val();
 		idkurikulum		= $("#kurikulum-new").val();
 		idmapel 		= $("#mapel-new").val();
 		bab 			= $("#proof-bab").val();
@@ -80,7 +81,8 @@ $(function(){
 					'idkurikulum'	: idkurikulum,
 					'idmapel'		: idmapel,
 					'bab'			: bab,
-					'idmapok'		: idmapok
+					'idmapok'		: idmapok,
+					'kurikulumold'	: kurikulumold
 				}
 			})
 		}else{
@@ -88,19 +90,112 @@ $(function(){
 		}
 	})
 
+	$("#mainmodalcontent").on('click', '.btn-proses-transfer-bab', function(){
+		idmapok			= $("#mapok-old").val();
+		namabab			= $("#proof-bab").val();
+		idmapel			= $("#mapel-new").val();
+		idkelas			= $("#kelas-new").val();
+		idkurikulum		= $("#kurikulum-new").val();
+		kurikulum 		= $("#kurikulum-old").val();
+
+		$.ajax({
+			type	: 'POST',
+			url		: 'proses_transfer_bab',
+			data	:{
+				'key'			: key,
+				'idmapok'		: idmapok,
+				'namabab'		: namabab,
+				'idmapel'		: idmapel,
+				'idkelas'		: idkelas,
+				'idkurikulum'	: idkurikulum,
+				'kurikulum'		: kurikulum
+			}
+		})
+	})
+
+	$("#mapel-new").change(function(){
+		idmapel 	= $(this).val();
+		idkelas 	= $("#kelas-new").val();
+		idkurikulum = $("#kurikulum-new").val();
+		if(idmapel !== "" && idkelas !== "" && idkurikulum !== ""){
+			$.ajax({
+				type	: 'POST',
+				url		: 'ajax_bab',
+				data	:{
+					'key'			: key,
+					'idkelas'		: idkelas,
+					'idmapel'		: idmapel,
+					'idkurikulum'	: idkurikulum
+				}
+			})
+		}
+	})
+
+	$("#kelas-new").change(function(){
+		idmapel 	= $("#mapel-new").val();
+		idkelas 	= $(this).val();
+		idkurikulum = $("#kurikulum-new").val();
+		if(idmapel !== "" && idkelas !== "" && idkurikulum !== ""){
+			$.ajax({
+				type	: 'POST',
+				url		: 'ajax_bab',
+				data	:{
+					'key'			: key,
+					'idkelas'		: idkelas,
+					'idmapel'		: idmapel,
+					'idkurikulum'	: idkurikulum
+				}
+			})
+		}
+	})
+
+	$("#kurikulum-new").change(function(){
+		idmapel 	= $("#mapel-new").val();
+		idkelas 	= $("#kelas-new").val();
+		idkurikulum = $(this).val();
+		if(idmapel !== "" && idkelas !== "" && idkurikulum !== ""){
+			$.ajax({
+				type	: 'POST',
+				url		: 'ajax_bab',
+				data	:{
+					'key'			: key,
+					'idkelas'		: idkelas,
+					'idmapel'		: idmapel,
+					'idkurikulum'	: idkurikulum
+				}
+			})
+		}
+	})
+
+	$('#sub-materi-old').on('click', '.buat-sub', function(){
+		rawid 			= $(this).attr("id");
+		idsplit			= rawid.split("-");
+		idsubmateri 	= idsplit[2];
+		idbab 			= $("#bab-new").val();
+		idkelas 		= $("#kelas-new").val();
+		idkurikulum 	= $("#kurikulum-new").val();
+
+		$.ajax({
+			type	: 'POST',
+			url		: 'ajax_cek_buat_sub',
+			data	:{
+				'key'			: key,
+				'idsubmateri'	: idsubmateri,
+				'idbab'			: idbab,
+				'idkelas'		: idkelas,
+				'idkurikulum'	: idkurikulum
+			}
+		})
+	})
+
 	$(document).ajaxSend(function(event, jqxhr, settings){
 		$("#modal-loader").modal("show");
 	});
 	$(document).ajaxSuccess(function(event, request, options){
-		if(options.url !== "../adm_main/refresh_csrf"){
-			$.ajax({
-				type: 'GET',
-				url: '../adm_main/refresh_csrf'
-			});
-		}else if(options.url === "../adm_main/refresh_csrf"){
+		if(options.url === "../adm_main/refresh_csrf"){
 			$("#key").val(request.responseText);
 			$('#modal-loader').modal('hide');
-		}else{
+		}else if(options.url !== "proses_transfer_bab"){
 			$('#modal-loader').modal('hide');
 		}
 
@@ -117,6 +212,27 @@ $(function(){
 			$("#mainmodal").modal("show");
 			$("#mainmodaltitle").html("Konfirmasi Transfer Bab");
 			$("#mainmodalcontent").html(request.responseText);
+		}
+		if(options.url === "proses_transfer_bab"){
+			alert("TRANSFER BAB BERHASIL !")
+			idmapel 	= $("#mapel-new").val();
+			idkelas 	= $("#kelas-new").val();
+			idkurikulum = $("#kurikulum-new").val();
+			if(idmapel !== "" && idkelas !== "" && idkurikulum !== ""){
+				$.ajax({
+					type	: 'POST',
+					url		: 'ajax_bab',
+					data	:{
+						'key'			: key,
+						'idkelas'		: idkelas,
+						'idmapel'		: idmapel,
+						'idkurikulum'	: idkurikulum
+					}
+				})
+			}
+		}
+		if(options.url === "ajax_bab"){
+			$("#bab-new").html(request.responseText);
 		}
 	});
 	$(document).ajaxError(function(event, request, options){

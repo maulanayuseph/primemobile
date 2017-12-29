@@ -120,19 +120,93 @@ function ajax_cek_transfer_bab(){
 	$idmapel		= $params['idmapel'];
 	$bab			= $params['bab'];
 	$idmapok 		= $params['idmapok'];
+	$kurikulumold 	= $params['kurikulumold'];
 
 	$data = array(
 		'kelas'			=> $this->adm_migration_model->fetch_kelas_by_id($idkelas),
 		'kurikulum'		=> $this->adm_migration_model->fetch_kurikulum_by_id($idkurikulum),
 		'mapel'			=> $this->adm_migration_model->fetch_mapel_new_by_id($idmapel),
 		'bab'			=> $bab,
-		'mapok'			=> $this->adm_migration_model->fetch_mapok_by_id($idmapok)
+		'mapok'			=> $this->adm_migration_model->fetch_mapok_by_id($idmapok),
+		'kurikulumold'	=> $kurikulumold
 	);
-	$this->load->view("adm_migration/index_ajax_cek_transfer_bab");
+	$this->load->view("adm_migration/index_ajax_cek_transfer_bab", $data);
 }
 
 function proses_transfer_bab(){
-	
+	$params 		= $this->input->post(null, true);
+	$idmapok 		= $params['idmapok'];
+	$namabab		= $params['namabab'];
+	$idmapel 		= $params['idmapel'];
+	$idkelas		= $params['idkelas'];
+	$idkurikulum	= $params['idkurikulum'];
+	$kurikulum 		= $params['kurikulum'];
+
+	//cek apakah kurikulum_x_kelas sudah ada
+	$cekkurxkelas 	= $this->adm_migration_model->cek_kurikulum_x_kelas($idkurikulum, $idkelas);
+
+	if($cekkurxkelas == null){
+		//jika kurikulum_x_kelas tidak ada, insert baru
+		$insertkurxkelas = $this->adm_migration_model->insert_kurikulum_x_kelas($idkurikulum, $idkelas);
+		$idkurxkelas = $insertkurxkelas;
+	}else{
+		//jika kurikukulum_x_kelas ada, tangkap id_kurikulum_x_kelas
+		$idkurxkelas = $cekkurxkelas->id_kurikulum_x_kelas;
+	}
+
+	//cek apakah kurikulum_x_mapel sudah ada
+	$cekkurxmapel = $this->adm_migration_model->cek_kurikulum_x_mapel($idkurxkelas, $idmapel);
+
+	if($cekkurxmapel == null){
+		//jika kurikulum_x_mapel tidak ada, insert baru
+		$insertkurxmapel = $this->adm_migration_model->insert_kurikulum_x_mapel($idkurxkelas, $idmapel);
+	}
+
+	//cek dulu, apakah bab sudah ada, biar tidak terduplikat di tabel bab
+	$cekbab = $this->adm_migration_model->fetch_bab_by_nama_bab($namabab);
+
+	if($cekbab == null){
+		//jika tidak ada, insert bab baru, dan retun id bab barunya ke $insertbab
+		$insertbab 		= $this->adm_migration_model->insert_bab($idmapel, $namabab);
+	}else{
+		//jika bab sudah ada di tabel bab, masukkan id_bab ke $insertbab
+		$insertbab = $cekbab->id_bab;
+	}
+
+	//cek apakah kurikulum_x_bab sudah ada
+	$cekkurxbab = $this->adm_migration_model->cek_kurikulum_x_bab($idkurxkelas, $insertbab);
+	if($cekkurxbab == null){
+		$insertkurxbab = $this->adm_migration_model->insert_kurikulum_x_bab($idkurxkelas, $insertbab);
+
+		$idkurxbab = $insertkurxbab;
+	}else{
+		$idkurxbab = $cekkurxbab->id_kurikulum_x_bab;
+	}
+
+	//ganti semua rencana belajar dari materi pokok lama, ke idbab baru
+	if($kurikulum == "K-13 REVISI"){
+		$kurikulum = "k13rev";
+	}
+	$updaterencanabelajar = $this->adm_migration_model->update_rencana_belajar($idmapok, $idkurxbab, $kurikulum);
+}
+
+function ajax_bab(){
+	$params 		= $this->input->post(null, true);
+	$idkelas 		= $params['idkelas'];
+	$idmapel 		= $params['idmapel'];
+	$idkurikulum 	= $params['idkurikulum'];
+
+	$databab 	= $this->adm_migration_model->fetch_kurikulum_x_bab_by_mapel($idkelas, $idkurikulum, $idmapel);
+	echo '<option value="">-- Pilih Bab --</option>';
+	foreach($databab as $bab){
+		?>
+		<option value="<?php echo $bab->id_bab;?>"><?php echo $bab->nama_bab;?></option>
+		<?php
+	}
+}
+
+function ajax_cek_buat_bab(){
+	$params = $this->input->post(null, true);
 }
 
 }

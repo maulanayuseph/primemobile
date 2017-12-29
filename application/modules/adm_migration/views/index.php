@@ -162,6 +162,19 @@
                 </div>
               </div>
               <!-- end bab -->
+
+              <!-- sub bab -->
+              <div class="form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="sub-new">Sub Bab
+                </label>
+                <div class="col-md-9 col-sm-9 col-xs-12">
+                  <select class="form-control" id="sub-new">
+                    <option value="">-- Pilih Sub Bab --</option>
+                    
+                  </select>
+                </div>
+              </div>
+              <!-- end sub bab -->
               
             </form>
           </div>

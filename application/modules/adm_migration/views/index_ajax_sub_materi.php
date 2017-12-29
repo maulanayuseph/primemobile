@@ -33,8 +33,15 @@
 								echo $sub->nama_sub_materi;
 							?>
 						</td>
-						<td class="text-center">
+						<td>
 							<button class="btn btn-sm btn-success">Pindah >></button>
+							<?php
+								if($sub->kategori == 1){
+									?>
+									<button class="btn btn-sm btn-success buat-sub" id="buat-sub-<?php echo $sb->id_sub_materi;?>">Buat Sub-Bab >></button>
+									<?php
+								}
+							?>
 						</td>
 					</tr>
 					<?php
