@@ -1,1 +1,0 @@
-{"result":{"text":"fraction numerator 1 over denominator 2 space end fraction plus space 1 2 over 4 equals"},"status":"ok"}

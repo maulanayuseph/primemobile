@@ -1,1 +1,0 @@
-{"result":{"text":"\\sqrt2"},"status":"ok"}
