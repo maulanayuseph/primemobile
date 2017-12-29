@@ -38,7 +38,7 @@
 							<?php
 								if($sub->kategori == 1){
 									?>
-									<button class="btn btn-sm btn-success buat-sub" id="buat-sub-<?php echo $sb->id_sub_materi;?>">Buat Sub-Bab >></button>
+									<button class="btn btn-sm btn-success buat-sub" id="buat-sub-<?php echo $sub->id_sub_materi;?>">Buat Sub-Bab >></button>
 									<?php
 								}
 							?>

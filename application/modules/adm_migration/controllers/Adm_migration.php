@@ -205,8 +205,18 @@ function ajax_bab(){
 	}
 }
 
-function ajax_cek_buat_bab(){
-	$params = $this->input->post(null, true);
+function ajax_cek_buat_sub(){
+	$params 		= $this->input->post(null, true);
+	$idsubmateri 	= $params['idsubmateri'];
+	$idbab 			= $params['idbab'];
+	$idkelas 		= $params['idkelas'];
+	$idkurikulum 	= $params['idkurikulum'];
+
+	$data = array(
+
+	);
+
+	$this->load->view("adm_migration/index_ajax_cek_buat_sub", $data);
 }
 
 }

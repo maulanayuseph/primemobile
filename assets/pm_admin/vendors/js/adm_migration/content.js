@@ -175,17 +175,22 @@ $(function(){
 		idkelas 		= $("#kelas-new").val();
 		idkurikulum 	= $("#kurikulum-new").val();
 
-		$.ajax({
-			type	: 'POST',
-			url		: 'ajax_cek_buat_sub',
-			data	:{
-				'key'			: key,
-				'idsubmateri'	: idsubmateri,
-				'idbab'			: idbab,
-				'idkelas'		: idkelas,
-				'idkurikulum'	: idkurikulum
-			}
-		})
+		if(idbab !== "" && idkelas !== "" && idkurikulum !== ""){
+			$("#mainmodal").modal("show");
+			$.ajax({
+				type	: 'POST',
+				url		: 'ajax_cek_buat_sub',
+				data	:{
+					'key'			: key,
+					'idsubmateri'	: idsubmateri,
+					'idbab'			: idbab,
+					'idkelas'		: idkelas,
+					'idkurikulum'	: idkurikulum
+				}
+			})
+		}else{
+			alert("Pilih bab tujuan");
+		}
 	})
 
 	$(document).ajaxSend(function(event, jqxhr, settings){
@@ -232,7 +237,11 @@ $(function(){
 			}
 		}
 		if(options.url === "ajax_bab"){
+			$("#mainmodaltitle").html("Konfirmasi Pembuatan Sub Bab");
 			$("#bab-new").html(request.responseText);
+		}
+		if(options.url === "ajax_cek_buat_sub"){
+			$("#mainmodalcontent").html(request.responseText);
 		}
 	});
 	$(document).ajaxError(function(event, request, options){
