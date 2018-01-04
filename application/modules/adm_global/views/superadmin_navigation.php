@@ -125,6 +125,7 @@
           <li><a><i class="fa fa-arrows-h" aria-hidden="true"></i> Migration <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
               <li><a href="<?php echo base_url('adm_migration/content');?>">Content Migration</a></li>
+              <li><a href="<?php echo base_url('adm_migration/mass_migration');?>">Mass Migration</a></li>
             </ul>
           </li>
           <!-- MENU MIGRASI DB -->

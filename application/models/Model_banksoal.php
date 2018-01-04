@@ -301,7 +301,32 @@ function set_status_qc($idbanksoal, $statusqc){
 
 	$this->db->update("bank_soal", $data);
 }
+
+function count_waiting_approval(){
+	$this->db->select("*");
+	$this->db->from("bank_soal");
+	$this->db->join("kategori_bank_soal", "bank_soal.id_kategori_bank_soal = kategori_bank_soal.id_kategori_bank_soal");
+	$this->db->join("mata_pelajaran", "kategori_bank_soal.id_mapel = mata_pelajaran.id_mapel");
+	$this->db->join("kelas", "mata_pelajaran.kelas_id = kelas.id_kelas");
+	$this->db->where("bank_soal.qc_status", 0);
+
+	return $this->db->count_all_results();
+}
+
+
+function count_approved(){
+	$this->db->select("*");
+	$this->db->from("bank_soal");
+	$this->db->join("kategori_bank_soal", "bank_soal.id_kategori_bank_soal = kategori_bank_soal.id_kategori_bank_soal");
+	$this->db->join("mata_pelajaran", "kategori_bank_soal.id_mapel = mata_pelajaran.id_mapel");
+	$this->db->join("kelas", "mata_pelajaran.kelas_id = kelas.id_kelas");
+	$this->db->where("bank_soal.qc_status", 1);
+
+	return $this->db->count_all_results();
+}
 //END MODEL KEPERLUAN QC BANK SOAL
+
+
 
 }
 

@@ -47,7 +47,9 @@ function dashboard(){
 		'form_action' 	=> base_url() . $this->uri->slash_segment(1) . $this->uri->slash_segment(2),
 		'table_data'	=> $this->model_kurikulum->fetch_queue_soal(),
 		'jumlahsoal'	=> $this->model_kurikulum->hitung_queue_soal(),
-		'datakelas'		=> $this->model_banksoal->get_kelas()
+		'datakelas'		=> $this->model_banksoal->get_kelas(),
+		'jumlahbankwaiting'	=> $this->model_banksoal->count_waiting_approval(),
+		'jumlahbankapproved' => $this->model_banksoal->count_approved()
 	);
 
 	$this->load->view('pg_admin/qc_dashboard', $data);
