@@ -219,5 +219,522 @@ function ajax_cek_buat_sub(){
 	$this->load->view("adm_migration/index_ajax_cek_buat_sub", $data);
 }
 
+function mass_migration(){
+	$this->adm_main_model->security_level_superadmin();
+	$data = array(
+		'title'			=> 'Super Administrator Dashboard | Content Migration',
+		'content'		=> 'adm_migration/mass_index',
+		'headerassets'	=> 'adm_migration/mass_headerassets',
+		'footerassets'	=> 'adm_migration/mass_footerassets',
+		'dataadmin'		=> $this->adm_data(),
+		'datakelas'		=> $this->adm_migration_model->fetch_kelas(),
+		'datakurikulum'	=> $this->adm_migration_model->fetch_kurikulum(),
+		'datamapel'		=> $this->adm_migration_model->fetch_mapel()		
+	);
+	$this->load->view("template_admin/template_adm", $data);
+}
+
+function proses_mass_migrasi(){
+	$params 		= $this->input->post(null, true);
+	$kurikulumold 	= $params['kurikulumold'];
+	$mapelold 		= $params['mapelold'];
+	$kelasnew		= $params['kelasnew'];
+	$kurikulumnew	= $params['kurikulumnew'];
+	$mapelnew 		= $params['mapelnew'];
+
+
+	//cek apakah kurikulum_x_kelas sudah ada
+	$cekkurxkelas 	= $this->adm_migration_model->cek_kurikulum_x_kelas($kurikulumnew, $kelasnew);
+
+	if($cekkurxkelas == null){
+		//jika kurikulum_x_kelas tidak ada, insert baru
+		$insertkurxkelas = $this->adm_migration_model->insert_kurikulum_x_kelas($kurikulumnew, $kelasnew);
+		$idkurxkelas = $insertkurxkelas;
+	}else{
+		//jika kurikukulum_x_kelas ada, tangkap id_kurikulum_x_kelas
+		$idkurxkelas = $cekkurxkelas->id_kurikulum_x_kelas;
+	}
+
+	//cek apakah kurikulum_x_mapel sudah ada
+	$cekkurxmapel = $this->adm_migration_model->cek_kurikulum_x_mapel($idkurxkelas, $mapelnew);
+
+	if($cekkurxmapel == null){
+		//jika kurikulum_x_mapel tidak ada, insert baru
+		$insertkurxmapel = $this->adm_migration_model->insert_kurikulum_x_mapel($idkurxkelas, $mapelnew);
+
+		$lanjut = "lanjut";
+	}else{
+		$lanjut	= "nope";
+	}
+
+	$carimapok 	= $this->adm_migration_model->cari_mapok_by_mapel($mapelold);
+
+	if($lanjut == "lanjut"){
+		if($kurikulumold == "K-13"){
+			foreach($carimapok as $mapok){
+				$jumlahsubk13 		= $this->adm_migration_model->jumlah_subk13_by_mapok($mapok->id_materi_pokok);
+				$jumlahsubirisan 	= $this->adm_migration_model->jumlah_subkirisan_by_mapok($mapok->id_materi_pokok);
+
+				if($jumlahsubk13 > 0 or $jumlahsubirisan > 0){
+					//looping bab
+					//cek dulu, apakah bab sudah ada, biar tidak terduplikat di tabel bab
+					$cekbab = $this->adm_migration_model->fetch_bab_by_nama_bab($mapok->judul_bab_k13, $mapelnew);
+					if($cekbab == null){
+						//jika tidak ada, insert bab baru, dan retun id bab barunya ke $insertbab
+						$insertbab 		= $this->adm_migration_model->insert_bab($mapelnew, $mapok->judul_bab_k13);
+					}else{
+						//jika bab sudah ada di tabel bab, masukkan id_bab ke $insertbab
+						$insertbab = $cekbab->id_bab;
+					}
+
+					//cek apakah kurikulum_x_bab sudah ada
+					$cekkurxbab = $this->adm_migration_model->cek_kurikulum_x_bab($idkurxkelas, $insertbab);
+					if($cekkurxbab == null){
+						$insertkurxbab = $this->adm_migration_model->insert_kurikulum_x_bab($idkurxkelas, $insertbab, $mapok->bab_k13);
+
+						$idkurxbab = $insertkurxbab;
+					}else{
+						$idkurxbab = $cekkurxbab->id_kurikulum_x_bab;
+					}
+
+					//ganti semua rencana belajar dari materi pokok lama, ke idbab baru
+					if($kurikulumold == "K-13 REVISI"){
+						$kurikulumsiswa = "k13rev";
+					}
+					$updaterencanabelajar = $this->adm_migration_model->update_rencana_belajar($mapok->id_materi_pokok, $idkurxbab, $kurikulumsiswa);
+
+					//mulai transfer sub materi
+					//*************************
+					//*************************
+					$datasub = $this->adm_migration_model->fetch_sub_k13_by_mapok($mapok->id_materi_pokok);
+
+					foreach($datasub as $sub){
+						if($sub->kategori == 1){
+							//cek dulu apakah nama sub bab sudah ada
+							$ceksubbab = $this->adm_migration_model->fetch_sub_bab_by_nama_and_bab($sub->nama_sub_materi, $insertbab);
+
+							if($ceksubbab == null){
+								//jika sub bab tidak ada di tabel sub_bab
+								$insertsubbab 	= $this->adm_migration_model->insert_sub_bab($sub->nama_sub_materi, $insertbab);
+
+								$idsubbab = $insertsubbab;
+
+								//insert sub bab ke tabel kurikulum_x_sub_bab
+								$insertkurxsubbab = $this->adm_migration_model->insert_kurikulum_x_sub_bab($idkurxkelas, $idsubbab);
+
+								$idkurxsubbab = $insertkurxsubbab;
+							}else{
+								$idsubbab = $ceksubbab->id_sub_bab;
+
+								//cek apakah sub bab sudah ada di tabel kurikulum_x_sub_bab
+								$cekkurxsubbab = $this->adm_migration_model->cek_kurikulum_x_sub_bab($idkurxkelas, $idsubbab);
+
+								if($cekkurxsubbab == null){
+									//insert sub bab ke tabel kurikulum_x_sub_bab
+									$insertkurxsubbab = $this->adm_migration_model->insert_kurikulum_x_sub_bab($idkurxkelas, $idsubbab);
+
+									$idkurxsubbab = $insertkurxsubbab;
+								}else{
+									$idkurxsubbab = $cekkurxsubbab->id_kurikulum_x_sub_bab;
+								}
+							}
+							
+							//setelah mendapat id_kurikulum_x_sub_bab, sekarang waktunya membuat judul
+							$insertjudul 	= $this->adm_migration_model->insert_judul($idkurxsubbab, $sub->nama_sub_materi, 'materi');
+							$editjudulmateri = $this->adm_migration_model->edit_id_judul_materi($sub->id_sub_materi, $insertjudul);
+						}elseif($sub->kategori == 3){
+							$strsubbab 	= str_ireplace("latihan soal ", "", $sub->nama_sub_materi);
+
+							$cekuji = substr($sub->nama_sub_materi, 0, 14);
+
+							if($cekuji == "uji kompetensi"){
+								$uji = 1;
+							}else{
+								$uji = 0;
+							}
+
+							//cari apakah sub-bab tersebut ada
+							$ceksubbab = $this->adm_migration_model->fetch_sub_bab_by_nama_and_bab($strsubbab, $insertbab);
+							var_dump($ceksubbab);
+							if($ceksubbab !== null){
+								//cek apakah sub bab sudah ada di kurikulum_x_sub_bab
+								$cekkurxsubbab = $this->adm_migration_model->cek_kurikulum_x_sub_bab($idkurxkelas, $ceksubbab->id_sub_bab);
+
+								$idkurxsubbab = $cekkurxsubbab->id_kurikulum_x_sub_bab;
+							}
+
+							if($ceksubbab !== null){
+								$insertjudul = $this->adm_migration_model->insert_judul_soal($idkurxsubbab, $sub->nama_sub_materi, 'latihan', $uji);
+								$idjudul = $insertjudul;
+							}else{
+								$insertjudulunknown = $this->adm_migration_model->insert_judul_unknown($idkurxbab, $sub->nama_sub_materi, 'latihan', $uji);
+								$idjudul = $insertjudulunknown;
+							}
+
+							//mulai pemindahan soal
+
+							//fetch soalnya dulu
+							$datasoal = $this->adm_migration_model->fetch_soal_by_sub_materi($sub->id_sub_materi);
+
+							foreach($datasoal as $soal){
+								$transfer = $this->adm_migration_model->insert_bank_soal($soal->isi_soal, $soal->jawab_1, $soal->jawab_2, $soal->jawab_3, $soal->jawab_4, $soal->jawab_5, $soal->kunci_jawaban, $soal->bobot, $soal->pembahasan, $soal->pembahasan_video, $soal->status, $soal->id_adm);
+
+
+								//edit qc history
+								$updatehistory = $this->adm_migration_model->edit_qc_history($soal->id_soal, $transfer);
+
+								//masukkan judul_x_soal
+								$insertjudulxsoal = $this->adm_migration_model->insert_judul_x_soal($idjudul, $transfer);
+
+								//mulai transfer manajemen mapel ke soal
+								//**************************************
+								//**************************************
+								//**************************************
+
+								//id_kelas
+								//insert soal_x_kelas
+								$insertsoalxkelas = $this->adm_migration_model->insert_soal_x_kelas($kelasnew, $transfer);
+
+								//id_kurikulum
+								//insert soal_x_kurikulum
+								$insertsoalxkurikulum = $this->adm_migration_model->insert_soal_x_kurikulum($kurikulumnew, $transfer);
+
+								//id_mapel
+								//insert soal_x_mapel
+								$insertsoalxmapel = $this->adm_migration_model->insert_soal_x_mapel($mapelnew, $transfer);
+
+								//id_bab
+								//insert soal_x_bab
+								$insertsoalxbab = $this->adm_migration_model->insert_soal_x_bab($insertbab, $transfer);
+
+								//id_sub_bab
+								//insert soal_x_sub_bab
+								if($ceksubbab !== null){
+									$insertsoalxsubbab = $this->adm_migration_model->insert_soal_x_sub_bab($ceksubbab->id_sub_bab, $transfer);
+								}
+								//end transfer manajemen mapel ke soal
+								//**************************************
+								//**************************************
+								//**************************************
+							}
+						}
+					}
+					//end transfer sub materi
+					//*************************
+					//*************************
+				}
+			}
+		}elseif($kurikulumold == "K-13 REVISI"){
+			foreach($carimapok as $mapok){
+				$jumlahsubk13rev = $this->adm_migration_model->jumlah_subk13rev_by_mapok($mapok->id_materi_pokok);
+
+				if($jumlahsubk13rev > 0){
+					//looping bab
+					//cek dulu, apakah bab sudah ada, biar tidak terduplikat di tabel bab
+					$cekbab = $this->adm_migration_model->fetch_bab_by_nama_bab($mapok->judul_bab_k13, $mapelnew);
+					if($cekbab == null){
+						//jika tidak ada, insert bab baru, dan retun id bab barunya ke $insertbab
+						$insertbab 		= $this->adm_migration_model->insert_bab($mapelnew, $mapok->judul_bab_k13);
+					}else{
+						//jika bab sudah ada di tabel bab, masukkan id_bab ke $insertbab
+						$insertbab = $cekbab->id_bab;
+					}
+
+					//cek apakah kurikulum_x_bab sudah ada
+					$cekkurxbab = $this->adm_migration_model->cek_kurikulum_x_bab($idkurxkelas, $insertbab);
+					if($cekkurxbab == null){
+						$insertkurxbab = $this->adm_migration_model->insert_kurikulum_x_bab($idkurxkelas, $insertbab, $mapok->bab_k13);
+
+						$idkurxbab = $insertkurxbab;
+					}else{
+						$idkurxbab = $cekkurxbab->id_kurikulum_x_bab;
+					}
+
+					//ganti semua rencana belajar dari materi pokok lama, ke idbab baru
+					if($kurikulumold == "K-13 REVISI"){
+						$kurikulumsiswa = "k13rev";
+					}
+					$updaterencanabelajar = $this->adm_migration_model->update_rencana_belajar($mapok->id_materi_pokok, $idkurxbab, $kurikulumsiswa);
+
+					//mulai transfer sub materi
+					//*************************
+					//*************************
+					$datasub = $this->adm_migration_model->fetch_sub_k13rev_by_mapok($mapok->id_materi_pokok);
+
+					foreach($datasub as $sub){
+						if($sub->kategori == 1){
+							//cek dulu apakah nama sub bab sudah ada
+							$ceksubbab = $this->adm_migration_model->fetch_sub_bab_by_nama_and_bab($sub->nama_sub_materi, $insertbab);
+
+							if($ceksubbab == null){
+								//jika sub bab tidak ada di tabel sub_bab
+								$insertsubbab 	= $this->adm_migration_model->insert_sub_bab($sub->nama_sub_materi, $insertbab);
+
+								$idsubbab = $insertsubbab;
+
+								//insert sub bab ke tabel kurikulum_x_sub_bab
+								$insertkurxsubbab = $this->adm_migration_model->insert_kurikulum_x_sub_bab($idkurxkelas, $idsubbab);
+
+								$idkurxsubbab = $insertkurxsubbab;
+							}else{
+								$idsubbab = $ceksubbab->id_sub_bab;
+
+								//cek apakah sub bab sudah ada di tabel kurikulum_x_sub_bab
+								$cekkurxsubbab = $this->adm_migration_model->cek_kurikulum_x_sub_bab($idkurxkelas, $idsubbab);
+
+								if($cekkurxsubbab == null){
+									//insert sub bab ke tabel kurikulum_x_sub_bab
+									$insertkurxsubbab = $this->adm_migration_model->insert_kurikulum_x_sub_bab($idkurxkelas, $idsubbab);
+
+									$idkurxsubbab = $insertkurxsubbab;
+								}else{
+									$idkurxsubbab = $cekkurxsubbab->id_kurikulum_x_sub_bab;
+								}
+							}
+							
+							//setelah mendapat id_kurikulum_x_sub_bab, sekarang waktunya membuat judul
+							$insertjudul 	= $this->adm_migration_model->insert_judul($idkurxsubbab, $sub->nama_sub_materi, 'materi');
+							$editjudulmateri = $this->adm_migration_model->edit_id_judul_materi($sub->id_sub_materi, $insertjudul);
+						}elseif($sub->kategori == 3){
+							$strsubbab 	= str_ireplace("latihan soal ", "", $sub->nama_sub_materi);
+
+							$cekuji = substr($sub->nama_sub_materi, 0, 14);
+
+							if($cekuji == "uji kompetensi"){
+								$uji = 1;
+							}else{
+								$uji = 0;
+							}
+
+							//cari apakah sub-bab tersebut ada
+							$ceksubbab = $this->adm_migration_model->fetch_sub_bab_by_nama_and_bab($strsubbab, $insertbab);
+							var_dump($ceksubbab);
+							if($ceksubbab !== null){
+								//cek apakah sub bab sudah ada di kurikulum_x_sub_bab
+								$cekkurxsubbab = $this->adm_migration_model->cek_kurikulum_x_sub_bab($idkurxkelas, $ceksubbab->id_sub_bab);
+
+								$idkurxsubbab = $cekkurxsubbab->id_kurikulum_x_sub_bab;
+							}
+
+							if($ceksubbab !== null){
+								$insertjudul = $this->adm_migration_model->insert_judul_soal($idkurxsubbab, $sub->nama_sub_materi, 'latihan', $uji);
+								$idjudul = $insertjudul;
+							}else{
+								$insertjudulunknown = $this->adm_migration_model->insert_judul_unknown($idkurxbab, $sub->nama_sub_materi, 'latihan', $uji);
+								$idjudul = $insertjudulunknown;
+							}
+
+							//mulai pemindahan soal
+
+							//fetch soalnya dulu
+							$datasoal = $this->adm_migration_model->fetch_soal_by_sub_materi($sub->id_sub_materi);
+
+							foreach($datasoal as $soal){
+								$transfer = $this->adm_migration_model->insert_bank_soal($soal->isi_soal, $soal->jawab_1, $soal->jawab_2, $soal->jawab_3, $soal->jawab_4, $soal->jawab_5, $soal->kunci_jawaban, $soal->bobot, $soal->pembahasan, $soal->pembahasan_video, $soal->status, $soal->id_adm);
+
+
+								//edit qc history
+								$updatehistory = $this->adm_migration_model->edit_qc_history($soal->id_soal, $transfer);
+
+								//masukkan judul_x_soal
+								$insertjudulxsoal = $this->adm_migration_model->insert_judul_x_soal($idjudul, $transfer);
+
+								//mulai transfer manajemen mapel ke soal
+								//**************************************
+								//**************************************
+								//**************************************
+
+								//id_kelas
+								//insert soal_x_kelas
+								$insertsoalxkelas = $this->adm_migration_model->insert_soal_x_kelas($kelasnew, $transfer);
+
+								//id_kurikulum
+								//insert soal_x_kurikulum
+								$insertsoalxkurikulum = $this->adm_migration_model->insert_soal_x_kurikulum($kurikulumnew, $transfer);
+
+								//id_mapel
+								//insert soal_x_mapel
+								$insertsoalxmapel = $this->adm_migration_model->insert_soal_x_mapel($mapelnew, $transfer);
+
+								//id_bab
+								//insert soal_x_bab
+								$insertsoalxbab = $this->adm_migration_model->insert_soal_x_bab($insertbab, $transfer);
+
+								//id_sub_bab
+								//insert soal_x_sub_bab
+								if($ceksubbab !== null){
+									$insertsoalxsubbab = $this->adm_migration_model->insert_soal_x_sub_bab($ceksubbab->id_sub_bab, $transfer);
+								}
+								//end transfer manajemen mapel ke soal
+								//**************************************
+								//**************************************
+								//**************************************
+							}
+						}
+					}
+					//end transfer sub materi
+					//*************************
+					//*************************
+					
+				}
+			}
+		}elseif($kurikulumold == "KTSP"){
+			foreach($carimapok as $mapok){
+				$jumlahsubktsp 		= $this->adm_migration_model->jumlah_ktsp_by_mapok($mapok->id_materi_pokok);
+				$jumlahsubirisan 	= $this->adm_migration_model->jumlah_subkirisan_by_mapok($mapok->id_materi_pokok);
+
+				if($jumlahsubktsp > 0 or $jumlahsubirisan > 0){
+					//looping bab
+					//cek dulu, apakah bab sudah ada, biar tidak terduplikat di tabel bab
+					$cekbab = $this->adm_migration_model->fetch_bab_by_nama_bab($mapok->judul_bab_ktsp, $mapelnew);
+					if($cekbab == null){
+						//jika tidak ada, insert bab baru, dan retun id bab barunya ke $insertbab
+						$insertbab 		= $this->adm_migration_model->insert_bab($mapelnew, $mapok->judul_bab_ktsp);
+					}else{
+						//jika bab sudah ada di tabel bab, masukkan id_bab ke $insertbab
+						$insertbab = $cekbab->id_bab;
+					}
+
+					//cek apakah kurikulum_x_bab sudah ada
+					$cekkurxbab = $this->adm_migration_model->cek_kurikulum_x_bab($idkurxkelas, $insertbab);
+					if($cekkurxbab == null){
+						$insertkurxbab = $this->adm_migration_model->insert_kurikulum_x_bab($idkurxkelas, $insertbab, $mapok->bab_ktsp);
+
+						$idkurxbab = $insertkurxbab;
+					}else{
+						$idkurxbab = $cekkurxbab->id_kurikulum_x_bab;
+					}
+
+					//ganti semua rencana belajar dari materi pokok lama, ke idbab baru
+					if($kurikulumold == "K-13 REVISI"){
+						$kurikulumsiswa = "k13rev";
+					}
+					$updaterencanabelajar = $this->adm_migration_model->update_rencana_belajar($mapok->id_materi_pokok, $idkurxbab, $kurikulumsiswa);
+
+					//mulai transfer sub materi
+					//*************************
+					//*************************
+					$datasub = $this->adm_migration_model->fetch_sub_ktsp_by_mapok($mapok->id_materi_pokok);
+
+					foreach($datasub as $sub){
+						if($sub->kategori == 1){
+							//cek dulu apakah nama sub bab sudah ada
+							$ceksubbab = $this->adm_migration_model->fetch_sub_bab_by_nama_and_bab($sub->nama_sub_materi, $insertbab);
+
+							if($ceksubbab == null){
+								//jika sub bab tidak ada di tabel sub_bab
+								$insertsubbab 	= $this->adm_migration_model->insert_sub_bab($sub->nama_sub_materi, $insertbab);
+
+								$idsubbab = $insertsubbab;
+
+								//insert sub bab ke tabel kurikulum_x_sub_bab
+								$insertkurxsubbab = $this->adm_migration_model->insert_kurikulum_x_sub_bab($idkurxkelas, $idsubbab);
+
+								$idkurxsubbab = $insertkurxsubbab;
+							}else{
+								$idsubbab = $ceksubbab->id_sub_bab;
+
+								//cek apakah sub bab sudah ada di tabel kurikulum_x_sub_bab
+								$cekkurxsubbab = $this->adm_migration_model->cek_kurikulum_x_sub_bab($idkurxkelas, $idsubbab);
+
+								if($cekkurxsubbab == null){
+									//insert sub bab ke tabel kurikulum_x_sub_bab
+									$insertkurxsubbab = $this->adm_migration_model->insert_kurikulum_x_sub_bab($idkurxkelas, $idsubbab);
+
+									$idkurxsubbab = $insertkurxsubbab;
+								}else{
+									$idkurxsubbab = $cekkurxsubbab->id_kurikulum_x_sub_bab;
+								}
+							}
+							
+							//setelah mendapat id_kurikulum_x_sub_bab, sekarang waktunya membuat judul
+							$insertjudul 	= $this->adm_migration_model->insert_judul($idkurxsubbab, $sub->nama_sub_materi, 'materi');
+							$editjudulmateri = $this->adm_migration_model->edit_id_judul_materi($sub->id_sub_materi, $insertjudul);
+						}elseif($sub->kategori == 3){
+							$strsubbab 	= str_ireplace("latihan soal ", "", $sub->nama_sub_materi);
+
+							$cekuji = substr($sub->nama_sub_materi, 0, 14);
+
+							if($cekuji == "uji kompetensi"){
+								$uji = 1;
+							}else{
+								$uji = 0;
+							}
+
+							//cari apakah sub-bab tersebut ada
+							$ceksubbab = $this->adm_migration_model->fetch_sub_bab_by_nama_and_bab($strsubbab, $insertbab);
+							var_dump($ceksubbab);
+							if($ceksubbab !== null){
+								//cek apakah sub bab sudah ada di kurikulum_x_sub_bab
+								$cekkurxsubbab = $this->adm_migration_model->cek_kurikulum_x_sub_bab($idkurxkelas, $ceksubbab->id_sub_bab);
+
+								$idkurxsubbab = $cekkurxsubbab->id_kurikulum_x_sub_bab;
+							}
+
+							if($ceksubbab !== null){
+								$insertjudul = $this->adm_migration_model->insert_judul_soal($idkurxsubbab, $sub->nama_sub_materi, 'latihan', $uji);
+								$idjudul = $insertjudul;
+							}else{
+								$insertjudulunknown = $this->adm_migration_model->insert_judul_unknown($idkurxbab, $sub->nama_sub_materi, 'latihan', $uji);
+								$idjudul = $insertjudulunknown;
+							}
+
+							//mulai pemindahan soal
+
+							//fetch soalnya dulu
+							$datasoal = $this->adm_migration_model->fetch_soal_by_sub_materi($sub->id_sub_materi);
+
+							foreach($datasoal as $soal){
+								$transfer = $this->adm_migration_model->insert_bank_soal($soal->isi_soal, $soal->jawab_1, $soal->jawab_2, $soal->jawab_3, $soal->jawab_4, $soal->jawab_5, $soal->kunci_jawaban, $soal->bobot, $soal->pembahasan, $soal->pembahasan_video, $soal->status, $soal->id_adm);
+
+
+								//edit qc history
+								$updatehistory = $this->adm_migration_model->edit_qc_history($soal->id_soal, $transfer);
+
+								//masukkan judul_x_soal
+								$insertjudulxsoal = $this->adm_migration_model->insert_judul_x_soal($idjudul, $transfer);
+
+								//mulai transfer manajemen mapel ke soal
+								//**************************************
+								//**************************************
+								//**************************************
+
+								//id_kelas
+								//insert soal_x_kelas
+								$insertsoalxkelas = $this->adm_migration_model->insert_soal_x_kelas($kelasnew, $transfer);
+
+								//id_kurikulum
+								//insert soal_x_kurikulum
+								$insertsoalxkurikulum = $this->adm_migration_model->insert_soal_x_kurikulum($kurikulumnew, $transfer);
+
+								//id_mapel
+								//insert soal_x_mapel
+								$insertsoalxmapel = $this->adm_migration_model->insert_soal_x_mapel($mapelnew, $transfer);
+
+								//id_bab
+								//insert soal_x_bab
+								$insertsoalxbab = $this->adm_migration_model->insert_soal_x_bab($insertbab, $transfer);
+
+								//id_sub_bab
+								//insert soal_x_sub_bab
+								if($ceksubbab !== null){
+									$insertsoalxsubbab = $this->adm_migration_model->insert_soal_x_sub_bab($ceksubbab->id_sub_bab, $transfer);
+								}
+								//end transfer manajemen mapel ke soal
+								//**************************************
+								//**************************************
+								//**************************************
+							}
+						}
+					}
+					//end transfer sub materi
+					//*************************
+					//*************************
+				}
+			}
+		}
+	}
+}
+
 }
 ?>

@@ -72,6 +72,7 @@ $(function(){
 		idmapok 		= $("#mapok-old").val();
 
 		if(idkelas !== "" && idkurikulum !== "" && idmapel !== "" && idmapok !== ""){
+			$("#mainmodal").modal("show");
 			$.ajax({
 				type: 'POST',
 				url: 'ajax_cek_transfer_bab',
@@ -214,7 +215,6 @@ $(function(){
 			$("#sub-materi-old").html(request.responseText);
 		}
 		if(options.url === "ajax_cek_transfer_bab"){
-			$("#mainmodal").modal("show");
 			$("#mainmodaltitle").html("Konfirmasi Transfer Bab");
 			$("#mainmodalcontent").html(request.responseText);
 		}

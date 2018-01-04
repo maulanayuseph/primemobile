@@ -39,6 +39,10 @@ function security_level_superadmin(){
 	}
 }
 
+function security_level_superadmin_or_editor(){
+	
+}
+
 function fetch_admin_by_id($idadm){
 	$this->db->select("*");
 	$this->db->from("login_adm");
