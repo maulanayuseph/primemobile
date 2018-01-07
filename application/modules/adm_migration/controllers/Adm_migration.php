@@ -340,8 +340,17 @@ function proses_mass_migrasi(){
 							}
 							
 							//setelah mendapat id_kurikulum_x_sub_bab, sekarang waktunya membuat judul
+							//cek dulu, apakah materi sudah memiliiki id_judul, jika sudah, insert materi baru...
+							$materiexist  		= $this->adm_migration_model->cek_existing_materi($sub->id_sub_materi);
+
 							$insertjudul 	= $this->adm_migration_model->insert_judul($idkurxsubbab, $sub->nama_sub_materi, 'materi');
-							$editjudulmateri = $this->adm_migration_model->edit_id_judul_materi($sub->id_sub_materi, $insertjudul);
+							if($materiexist->id_judul == 0){
+								
+								$editjudulmateri = $this->adm_migration_model->edit_id_judul_materi($sub->id_sub_materi, $insertjudul);
+							}else{
+								$insertmateri = $this->adm_migration_model->insert_materi($insertjudul, $materiexist->isi_materi, $materiexist->tanggal, $materiexist->waktu, $materiexist->status_konten, $materiexist->id_adm);	
+							}
+							
 						}elseif($sub->kategori == 3){
 							$strsubbab 	= str_ireplace("latihan soal ", "", $sub->nama_sub_materi);
 

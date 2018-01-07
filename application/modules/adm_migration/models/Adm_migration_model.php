@@ -455,6 +455,27 @@ function insert_soal_x_sub_bab($idsubbab, $idsoal){
 	);
 	$this->db->insert("soal_x_sub_bab", $data);
 }
+
+function cek_existing_materi($idsubmateri){
+	$this->db->select("*");
+	$this->db->from("konten_materi");
+	$this->db->where("sub_materi_id", $idsubmateri);
+
+	$query = $this->db->get();
+	return $query->row();
+}
+
+function insert_materi($idjudul, $materi, $tanggal, $waktu, $statuskonten, $idadm){
+	$data = array(
+		'id_judul'		=> $idjudul,
+		'isi_materi'	=> $materi,
+		'tanggal'		=> $tanggal,
+		'waktu'			=> $waktu,
+		'status_konten'	=> $statuskonten,
+		'id_adm'		=> $idadm
+	);
+	$this->db->insert("konten_materi", $data);
+}
 }
 
 ?>
