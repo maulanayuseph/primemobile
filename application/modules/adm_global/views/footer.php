@@ -1,3 +1,19 @@
+<!-- identifier untuk notifikasi -->
+<?php
+  if($this->session->flashdata('success')){
+    $kategorinotif  = "success";
+    $pesannotif     = $this->session->flashdata('success');
+  }elseif($this->session->flashdata('error')){
+    $kategorinotif  = "error";
+    $pesannotif     = $this->session->flashdata('error');
+  }else{
+    $kategorinotif  = "nope";
+    $pesannotif     = "";
+  }
+?>
+<input type="hidden" id="kategori-notif" value="<?php echo $kategorinotif;?>">
+<input type="hidden" id="pesan-notif" value="<?php echo $pesannotif;?>">
+<!-- /end identifier notifikasi -->
 <input type="hidden" id="key" value="<?php echo $this->security->get_csrf_hash(); ?>">
 <?php
   if($title !== "Content Management System Login"){
