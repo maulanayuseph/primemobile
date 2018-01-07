@@ -8,6 +8,12 @@
 <script src="<?php echo vendor_asset;?>nprogress/nprogress.js"></script>
 <!-- jQuery custom content scroller -->
 <script src="<?php echo vendor_asset;?>malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
+<!-- JQuery Nestable -->
+<script src="<?php echo vendor_asset;?>nestable/jquery.nestable.js"></script>
+<!-- pnotify -->
+<script src="<?php echo vendor_asset;?>pnotify/dist/pnotify.js"></script>
+<script src="<?php echo vendor_asset;?>pnotify/dist/pnotify.buttons.js"></script>
+<script src="<?php echo vendor_asset;?>pnotify/dist/pnotify.nonblock.js"></script>
 <!-- Custom Theme Scripts -->
 <script src="<?php echo adm_asset;?>js/custom.min.js"></script>
 
