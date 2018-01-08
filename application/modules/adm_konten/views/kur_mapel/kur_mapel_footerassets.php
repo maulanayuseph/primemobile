@@ -14,6 +14,8 @@
 <script src="<?php echo vendor_asset;?>pnotify/dist/pnotify.js"></script>
 <script src="<?php echo vendor_asset;?>pnotify/dist/pnotify.buttons.js"></script>
 <script src="<?php echo vendor_asset;?>pnotify/dist/pnotify.nonblock.js"></script>
+<!-- chosen select -->
+<script src="<?php echo vendor_asset;?>chosen/chosen.jquery.js"></script>
 <!-- Custom Theme Scripts -->
 <script src="<?php echo adm_asset;?>js/custom.min.js"></script>
 

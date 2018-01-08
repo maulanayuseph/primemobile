@@ -76,6 +76,7 @@ function fetch_row_kur_bab($idkelas, $idkurikulum, $idbab){
 	$this->db->select("*");
 	$this->db->from("kurikulum_x_bab");
 	$this->db->join("bab", "kurikulum_x_bab.id_bab = bab.id_bab");
+	$this->db->join("mapel", "bab.id_mapel = mapel.id_mapel");
 	$this->db->join("kurikulum_x_kelas", "kurikulum_x_bab.id_kurikulum_x_kelas = kurikulum_x_kelas.id_kurikulum_x_kelas");
 	$this->db->where("kurikulum_x_kelas.id_kelas", $idkelas);
 	$this->db->where("kurikulum_x_kelas.id_kurikulum", $idkurikulum);
@@ -159,8 +160,10 @@ function fetch_all_kurikulum(){
 function fetch_kurikulum_x_kelas_by_kurikulum_and_kelas($idkurikulum, $idkelas){
 	$this->db->select("*");
 	$this->db->from("kurikulum_x_kelas");
-	$this->db->where("id_kurikulum", $idkurikulum);
-	$this->db->where("id_kelas", $idkelas);
+	$this->db->join("kelas", "kurikulum_x_kelas.id_kelas = kelas.id_kelas", "left");
+	$this->db->join("kurikulum", "kurikulum_x_kelas.id_kurikulum = kurikulum.id_kurikulum", "left");
+	$this->db->where("kurikulum_x_kelas.id_kurikulum", $idkurikulum);
+	$this->db->where("kurikulum_x_kelas.id_kelas", $idkelas);
 
 	$query = $this->db->get();	
 	return $query->row();
@@ -178,5 +181,172 @@ function insert_kurikulum_x_kelas($idkurikulum, $idkelas){
 		return false;
 	}
 }
+
+function fetch_all_mapel(){
+	$this->db->select("*");
+	$this->db->from("mapel");
+	$query = $this->db->get();	
+	return $query->result();
+}
+
+function fetch_kurikulum_x_mapel_by_kelas_and_mapel($idkurxkelas, $idmapel){
+	$this->db->select("*");
+	$this->db->from("kurikulum_x_mapel");
+	$this->db->join("mapel", "kurikulum_x_mapel.id_mapel = mapel.id_mapel");
+	$this->db->where("id_kurikulum_x_kelas", $idkurxkelas);
+	$this->db->where("kurikulum_x_mapel.id_mapel", $idmapel);
+
+	$query = $this->db->get();	
+	return $query->row();
+}
+
+function insert_kurikulum_x_mapel($idkurxkelas, $idmapel){
+	$data = array(
+		'id_kurikulum_x_kelas'	=> $idkurxkelas,
+		'id_mapel'				=> $idmapel
+	);
+
+	$insert 	= $this->db->insert("kurikulum_x_mapel", $data);
+	if($insert){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+function fetch_bab_by_mapel($idmapel){
+	$this->db->select("*");
+	$this->db->from("bab");
+	$this->db->where("id_mapel", $idmapel);
+
+	$query = $this->db->get();	
+	return $query->result();
+}
+
+function insert_bab($idmapel, $bab){
+	$data = array(
+		'id_mapel'	=> $idmapel,
+		'nama_bab'	=> $bab
+	);
+	$this->db->insert("bab", $data);
+	$this->insert_id = $this->db->insert_id();
+	$insert_id = $this->insert_id;
+	return $insert_id;
+}
+
+function insert_kurikulum_x_bab($idkurxkelas, $idbab){
+	$data = array(
+		'id_kurikulum_x_kelas'	=> $idkurxkelas,
+		'id_bab'				=> $idbab
+	);
+	$insert = $this->db->insert("kurikulum_x_bab", $data);
+	if($insert){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+function hapus_kurikulum_x_kelas($idkurkelas){
+	$this->db->where("id_kurikulum_x_kelas", $idkurkelas);
+	$hapus = $this->db->delete("kurikulum_x_kelas");
+	if($hapus){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+function hapus_kurikulum_x_mapel($idkurmapel){
+	$this->db->where("id_kurikulum_x_mapel", $idkurmapel);
+	$hapus = $this->db->delete("kurikulum_x_mapel");
+	if($hapus){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+function fetch_bab_by_nama_and_mapel($idmapel, $namabab){
+	$this->db->select("*");
+	$this->db->from("bab");
+	$this->db->where("id_mapel", $idmapel);
+	$this->db->where("nama_bab", $namabab);
+
+	$query = $this->db->get();	
+	return $query->row();
+}
+
+function hapus_kurikulum_x_bab($idkurbab){
+	$this->db->where("id_kurikulum_x_bab", $idkurbab);
+	$hapus = $this->db->delete("kurikulum_x_bab");
+	if($hapus){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+function fetch_sub_bab_by_bab($idbab){
+	$this->db->select("*");
+	$this->db->from("sub_bab");
+	$this->db->where("id_bab", $idbab);
+
+	$query = $this->db->get();	
+	return $query->result();
+}
+
+function fetch_sub_bab_by_nama($namasub){
+	$this->db->select("*");
+	$this->db->from("sub_bab");
+	$this->db->where("nama_sub_bab", $namasub);
+
+	$query = $this->db->get();	
+	return $query->row();
+}
+
+function insert_sub_bab($idbab, $namasub){
+	$data = array(
+		'id_bab'		=> $idbab,
+		'nama_sub_bab'	=> $namasub
+	);
+	$this->db->insert("sub_bab", $data);
+	$this->insert_id = $this->db->insert_id();
+	$insert_id = $this->insert_id;
+	return $insert_id;
+}
+
+function fetch_kur_sub_by_sub_and_kur_kelas($idkurkelas, $idsub){
+	$this->db->select("*");
+	$this->db->from("kurikulum_x_sub_bab");
+	$this->db->where("id_kurikulum_x_kelas", $idkurkelas);
+	$this->db->where("id_sub_bab", $idsub);
+
+	$query = $this->db->get();	
+	return $query->row();
+}
+
+function insert_kurikulum_x_sub_bab($idkurkelas, $idsub){
+	$data = array(
+		'id_kurikulum_x_kelas'	=> $idkurkelas,
+		'id_sub_bab'			=> $idsub
+	);
+	$insert = $this->db->insert("kurikulum_x_sub_bab", $data);
+	if($insert){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+function fetch_kurikulum_x_sub_bab_by_id($idkursub){
+	$this->db->select("*");
+	$this->db->from("kurikulum_x_sub_bab");
+	$this->db->where("id_kurikulum_x_sub_bab", $idkursub);
+
+	$query = $this->db->get();	
+	return $query->row();
+}
+
 }
 ?>

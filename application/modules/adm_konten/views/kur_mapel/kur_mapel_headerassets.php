@@ -14,6 +14,7 @@
 <link href="<?php echo vendor_asset;?>pnotify/dist/pnotify.css" rel="stylesheet">
 <link href="<?php echo vendor_asset;?>pnotify/dist/pnotify.buttons.css" rel="stylesheet">
 <link href="<?php echo vendor_asset;?>pnotify/dist/pnotify.nonblock.css" rel="stylesheet">
+<link href="<?php echo vendor_asset;?>chosen/chosen.css" rel="stylesheet">
 <!-- Custom Theme Style -->
 <link href="<?php echo adm_asset;?>css/custom.min.css" rel="stylesheet">
 <link href="<?php echo adm_asset;?>css/nestable.css" rel="stylesheet">
