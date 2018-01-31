@@ -97,9 +97,13 @@ class Login extends CI_Controller
 				$id_siswa = isset($_SESSION['id_siswa']) ? $_SESSION['id_siswa'] : 0;
 				$datapembelian = $this->model_pembayaran->get_tagihan_by_siswa($id_siswa);
 				if(empty($datapembelian)){
-					redirect("user/aktivasi");
+          //var_dump($this->session->userdata('akses'));
+          //var_dump($do_login);
+					//redirect("user/aktivasi");
+          redirect('payment/cek');
 				}else{
-					redirect("user/buylist");
+					//redirect("user/buylist");
+          redirect('payment/cek');
 				}
 			}else{
 				//cek apakah user SBMPTN atau user reguler
@@ -134,7 +138,7 @@ class Login extends CI_Controller
     //get user access
     $siswa_access = $this->model_login->cek_user_akses($do_login['id_siswa']);
     $akses_kelas = array();
-
+   
     foreach ($siswa_access as $item) {
       //firstly, let's check the paket's expiration date
       $sedang_aktif = $this->cek_masa_aktif($item);

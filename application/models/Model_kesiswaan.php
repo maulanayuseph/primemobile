@@ -179,5 +179,18 @@ function fetch_kelas_paralel_by_sekolah($idsekolah){
 }
 //end fungsi otomatisasi kelas paralel
 
+
+//fungsi suspend siswa
+function suspend_siswa($idsiswa){
+	$tanggal = date("Y-m-d");
+	$data = array(
+		'expired_on'	=> $tanggal,
+		'isaktif'		=> 0
+	);
+	$this->db->where("id_siswa", $idsiswa);
+	$this->db->where("expired_on >=", $tanggal);
+	$this->db->where("isaktif", 1);
+	$this->db->update("paket_aktif", $data);
+}
 }
 ?>

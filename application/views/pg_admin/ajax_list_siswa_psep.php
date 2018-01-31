@@ -1,3 +1,7 @@
+<div class="col-sm-12" style="text-align: right;">
+	<button class="btn btn-sm btn-danger" id="suspend">Suspend Semua Siswa</button>
+	<br>&nbsp;
+</div>
 <table class="table display table-bordered table-striped">
 	<thead>
 		<tr>

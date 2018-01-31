@@ -125,7 +125,7 @@ function fetch_voucher_by_aktivasi($nmr_aktivasi){
 }
 
 function fetch_existing_aktivation($idsiswa, $tanggalsekarang){
-	$this->db->select("*");
+	$this->db->select("paket_aktif.id_paket_aktif, paket_aktif.id_paket, paket_aktif.id_siswa, paket_aktif.expired_on");
 	$this->db->from("paket_aktif");
 	$this->db->join("paket", "paket_aktif.id_paket = paket.id_paket", "left");
 	$this->db->where("id_siswa", $idsiswa);

@@ -81,6 +81,8 @@ class Login extends CI_Controller {
 					redirect("pg_admin/pa");
 				}elseif($this->session->userdata('level') == "adminfinalqc"){
 					redirect("pg_admin/final_qc/dashboard");
+				}elseif($this->session->userdata('level') == "keuangan"){
+					redirect("pg_admin/keuangan/dashboard");
 				}else{
 					redirect('pg_admin/dashboard');
 				}

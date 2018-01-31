@@ -84,34 +84,34 @@ class Model_login extends CI_Model
 	function cek_user_akses($idsiswa)
 	{
 		$tanggalsekarang = date('Y-m-d');
-		$this->db->select("*");
+		$this->db->select("paket_aktif.id_siswa, paket_aktif.id_kelas, paket_aktif.id_paket, paket_aktif.kode_voucher, paket_aktif.timestamp, paket_aktif.expired_on, paket_aktif.isaktif, paket.kode_paket, paket.durasi, paket.tipe");
 		$this->db->from('paket_aktif');
-		$this->db->join("paket", "paket_aktif.id_paket = paket.id_paket", "left");
-		$this->db->where('id_siswa', $idsiswa);
-		$this->db->where("expired_on >=", $tanggalsekarang);
+		$this->db->join("paket", "paket_aktif.id_paket = paket.id_paket");
+		$this->db->where('paket_aktif.id_siswa', $idsiswa);
+		$this->db->where("paket_aktif.expired_on >=", $tanggalsekarang);
 		$this->db->where("paket.tipe", 0);
 		$this->db->where("paket_aktif.isaktif", 1);
-		$this->db->limit(0,1);
+		$this->db->limit(1,0);
 		if($this->db->count_all_results() > 0){
-			$this->db->select("*");
+			$this->db->select("paket_aktif.id_siswa, paket_aktif.id_kelas, paket_aktif.id_paket, paket_aktif.kode_voucher, paket_aktif.timestamp, paket_aktif.expired_on, paket_aktif.isaktif, paket.kode_paket, paket.durasi, paket.tipe");
 			$this->db->from('paket_aktif');
-			$this->db->join("paket", "paket_aktif.id_paket = paket.id_paket", "left");
+			$this->db->join("paket", "paket_aktif.id_paket = paket.id_paket");
 			$this->db->where('id_siswa', $idsiswa);
 			$this->db->where("expired_on >=", $tanggalsekarang);
 			$this->db->where("paket.tipe", 0);
 			$this->db->where("paket_aktif.isaktif", 1);
-			$this->db->limit(0,1);
+			$this->db->limit(1,0);
 
 			$query = $this->db->get();
 			return $query->result();
 		}else{
-			$this->db->select("*");
+			$this->db->select("paket_aktif.id_siswa, paket_aktif.id_kelas, paket_aktif.id_paket, paket_aktif.kode_voucher, paket_aktif.timestamp, paket_aktif.expired_on, paket_aktif.isaktif, paket.kode_paket, paket.durasi, paket.tipe");
 			$this->db->from('paket_aktif');
-			$this->db->join("paket", "paket_aktif.id_paket = paket.id_paket", "left");
+			$this->db->join("paket", "paket_aktif.id_paket = paket.id_paket");
 			$this->db->where('id_siswa', $idsiswa);
 			$this->db->where("expired_on >=", $tanggalsekarang);
 			$this->db->where("paket_aktif.isaktif", 1);
-			$this->db->limit(0,1);
+			$this->db->limit(1,0);
 
 			$query = $this->db->get();
 			return $query->result();

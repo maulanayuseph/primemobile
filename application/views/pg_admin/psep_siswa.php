@@ -176,6 +176,30 @@ $(function(){
 		}
 	})
 
+	$("#daftar-siswa").on("click", "#suspend", function(){
+		idsekolah 		= $("#sekolah").val();
+		idkelasparalel 	= $("#kelas").val();
+		idtahunajaran 	= $("#tahun").val();
+		if(confirm("Suspend Semua Siswa di Dalam Kelas ? Operasi Ini Tidak Bisa Dibatalkan. ")){
+			$.ajax({
+				type: 'POST',
+				url: '../sekolah/ajax_suspend_kelas',
+				data:{
+					'idsekolah'			: idsekolah,
+					'idkelasparalel'	: idkelasparalel,
+					'idtahunajaran'		: idtahunajaran
+				},
+				beforeSend: function(){
+					$("#modal-loader").modal('show');
+				},
+				success: function(response){
+					$("#modal-loader").modal('hide');
+					$("#daftar-siswa").load("../sekolah/ajax_daftar_siswa/" + idsekolah + "/" + idkelasparalel + "/" + idtahunajaran)
+				}
+			})
+		}
+	})
+
 	$(document).ajaxSend(function(event, jqxhr, settings){
 		if(settings.url === "../sekolah/hapus_siswa"){
 			$("#modal-loader").modal('show');

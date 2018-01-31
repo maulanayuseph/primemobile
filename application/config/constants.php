@@ -5,8 +5,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /* ASSETS */
 define('vendor_asset', 'http' . ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 's' : '').'://'.$_SERVER['HTTP_HOST'].str_replace('//','/',dirname($_SERVER['SCRIPT_NAME']).'/').'assets/pm_admin/vendors/');
 define('adm_asset', 'http' . ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 's' : '').'://'.$_SERVER['HTTP_HOST'].str_replace('//','/',dirname($_SERVER['SCRIPT_NAME']).'/').'assets/pm_admin/');
+define('url_reqpaymentcode', 'https://bersama.id/portal/index.php/api/tfp/generatePaymentCode');
+define('url_reqtrxstatus', 'https://bersama.id/portal/index.php/api/tfp/inquiryStatus');
 
+define('api_dealer', 'http://localhost/dealership/api/');
 
+define('username_tfp', 'nursodik@primemobile.co.id');
+define('password_tfp', 'pouEado1');
 /*
 |--------------------------------------------------------------------------
 | Display Debug backtrace

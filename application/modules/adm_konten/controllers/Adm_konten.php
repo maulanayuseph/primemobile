@@ -403,15 +403,130 @@ function tambah_judul(){
 	$konten 	= $params['konten'];
 
 	if($key !== $this->security->get_csrf_hash()){
-		alert("Token tidak sesuai");
 		redirect("adm_konten/kur_mapel");
 	}
 
 	if($konten == "mapel"){
-
+		if($tipe == "materi"){
+			$data = array(
+				'title'			=> 'Prime Mobile Management | Editor Materi',
+				'content'		=> 'adm_konten/editor/materi',
+				'headerassets'	=> 'adm_konten/editor/materi_headerassets',
+				'footerassets'	=> 'adm_konten/editor/materi_footerassets',
+				'dataadmin'		=> $this->adm_data(),
+				'datakur'		=> $this->adm_konten_model->fetch_datakur_by_kursubbab($idkursub),
+				'formaction'	=> 'proses_tambah_materi_mapel'
+			);
+			$this->load->view("template_admin/template_adm", $data);
+		}elseif($tipe == "latihan"){
+			$data = array(
+				'title'			=> 'Prime Mobile Management | Editor Materi',
+				'content'		=> 'adm_konten/editor/latihan',
+				'headerassets'	=> 'adm_konten/editor/latihan_headerassets',
+				'footerassets'	=> 'adm_konten/editor/latihan_footerassets',
+				'dataadmin'		=> $this->adm_data(),
+				'datakur'		=> $this->adm_konten_model->fetch_datakur_by_kursubbab($idkursub),
+				'formaction'	=> 'proses_tambah_materi_mapel',
+				'parentgroup'	=> $this->adm_konten_model->fetch_parent_group()
+			);
+			$this->load->view("template_admin/template_adm", $data);
+		}
 	}elseif($konten == "tematik"){
 		
+	}else{
+		redirect("adm_konten/kur_mapel");
 	}
 }
+
+function proses_tambah_materi_mapel(){
+	$params 	= $this->input->post(null, true);
+	$idkursub	= $params['idkursub'];
+	$judul 		= $params['judul'];
+	$materi 	= $_POST['materi'];
+	$idadm 		= $this->session->userdata('idlogin');
+	$tanggal 	= date("Y-m-d");
+	$waktu 		= date("H:i:s");
+
+	//insert judul
+	$insertjudul = $this->adm_konten_model->insert_judul('mapel', $idkursub, $judul, 'materi');
+
+	//insert materi
+	$insertmateri = $this->adm_konten_model->insert_materi($insertjudul, $materi, $tanggal, $waktu, $idadm);
+	if($insertmateri){
+		$this->session->set_flashdata('success', 'Materi ' . $judul . ' berhasil ditambahkan');
+		redirect("adm_konten/kur_mapel");
+	}else{
+		$this->session->set_flashdata('error', 'Materi ' . $judul . ' gagal ditambahkan');
+		redirect("adm_konten/kur_mapel");
+	}
+}
+
+function edit_materi_mapel($idjudul = null){
+	if($idjudul == null){
+		redirect("adm_konten/kur_mapel");
+	}
+
+	$data = array(
+		'title'			=> 'Prime Mobile Management | Editor Materi',
+		'content'		=> 'adm_konten/editor/materi',
+		'headerassets'	=> 'adm_konten/editor/materi_headerassets',
+		'footerassets'	=> 'adm_konten/editor/materi_footerassets',
+		'dataadmin'		=> $this->adm_data(),
+		'datakur'		=> $this->adm_konten_model->fetch_materi_by_judul($idjudul),
+		'materi'		=> $this->adm_konten_model->fetch_materi_by_judul($idjudul),
+		'author'		=> $this->adm_konten_model->fetch_author_materi($idjudul),
+		'formaction'	=> '../proses_edit_materi_mapel'
+	);
+	$this->load->view("template_admin/template_adm", $data);
+}
+
+function proses_edit_materi_mapel(){
+	$params 	= $this->input->post(null, true);
+	$idjudul 	= $params['idjudul'];
+	$idkursub	= $params['idkursub'];
+	$judul 		= $params['judul'];
+	$materi 	= $_POST['materi'];
+	$idadm 		= $this->session->userdata('idlogin');
+
+	$fetchmateri = $this->adm_konten_model->fetch_materi_by_judul($idjudul);
+	//edit judul
+	$editjudul 	= $this->adm_konten_model->edit_judul($idjudul, $judul);
+	//edit materi
+	$editmateri = $this->adm_konten_model->edit_materi($fetchmateri->id_konten, $materi);
+
+	if($editmateri){
+		$this->session->set_flashdata('success', 'Materi ' . $judul . ' berhasil diubah');
+		redirect("adm_konten/kur_mapel");
+	}else{
+		$this->session->set_flashdata('error', 'Materi ' . $judul . ' gagal diubah');
+		redirect("adm_konten/kur_mapel");
+	}
+}
+
+function ajax_expand_group_latihan(){
+	$params 	= $this->input->post(null, true);
+	$idgroup 	= $params['idgroup'];
+
+	$data = array(
+		'datagroup'	=> $this->adm_konten_model->fetch_group_by_parent($idgroup)
+	);
+	$this->load->view("adm_konten/editor/latihan_ajax_expand_group", $data);
+}
+
+function proses_tambah_latihan_soal_mapel(){
+	$params 	= $this->input->post(null, true);
+	$judul 		= $params['judul'];
+	$soal 		= $_POST['soal'];
+	$jawab1 	= $_POST['jawab1'];
+	$jawab2 	= $_POST['jawab2'];
+	$jawab3 	= $_POST['jaawb3'];
+	$jawab4 	= $_POST['jawab4'];
+	$jawab5 	= $_POST['jawab5'];
+	$kunci 		= $params['kunci'];
+	$bobot 		= $params['bobot'];
+
+	
+}
+
 }
 ?>

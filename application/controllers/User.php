@@ -2363,6 +2363,13 @@ function dashboard(){
 	}else{
 		$datamapelun = null;
 	}
+
+	//sbmptn
+	if($kelasaktif->id_kelas == 20 or $kelasaktif->id_kelas == 19){
+		$datasbmptn = $this->model_dashboard->get_mapel_sbmptn();
+	}else{
+		$datasbmptn = null;
+	}
 	$data = array(
 		'infosiswa'				=> $infosiswa,
 		'datamapel'				=> $carimapel,
@@ -2381,7 +2388,8 @@ function dashboard(){
 		'datacbtpsep'			=> $this->model_tryout->fetch_cbt_psep(),
 		'tahunajaran'			=> $tahunajaransiswa,
 		'materibelajar'			=> $this->model_rencana_belajar->fetch_materi_belajar($idsiswa, $carikelas->id_kelas),
-		'mapeltersimpan'		=> $this->model_rencana_belajar->fetch_mapel_by_materi_tersimpan_and_kelas_aktif($idsiswa, $kelas)
+		'mapeltersimpan'		=> $this->model_rencana_belajar->fetch_mapel_by_materi_tersimpan_and_kelas_aktif($idsiswa, $kelas),
+		'datasbmptn'			=> $datasbmptn
 		//'datapr'				=> $this->model_psep->fetch_pr_by_kelas_and_tahun_ajaran($tahunajaransiswa->id_kelas_paralel, $tahunajaransiswa->id_tahun_ajaran)
 	);
 	

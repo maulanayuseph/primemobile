@@ -33,7 +33,7 @@
 								foreach($datajudul as $judul){
 									if($judul->id_sub == $sub->id_kurikulum_x_sub_bab){
 										if($judul->tipe == "materi"){
-											$function 	= "edit_materi";
+											$function 	= "edit_materi_mapel";
 											$icon		= "fa fa-book";	
 										}elseif($judul->tipe == "latihan"){
 											$function 	= "latihan";
@@ -214,7 +214,7 @@
 							<select class="form-control" name="tipe" required>
 								<option value="">-- Pilih Tipe --</option>
 								<option value="materi">Materi</option>
-								<option value="latihan">Latihan</option>
+								<option value="latihan">Latihan Soal</option>
 							</select>
 							<input type="hidden" name="key" value="<?php echo $this->security->get_csrf_hash(); ?>">
 							<input type="hidden" name="idkursub" id="tambah-judul-idkursub">

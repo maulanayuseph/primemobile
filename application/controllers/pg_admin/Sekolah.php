@@ -831,4 +831,17 @@ function detail_penerbitan($iddealer, $tipe, $idpenerbitan){
 	$this->load->view("pg_admin/psep/detail_penerbitan", $data);
 }
 
+function ajax_suspend_kelas(){
+	$params = $this->input->post(null, true);
+	$idkelasparalel = $params['idkelasparalel'];
+	$idtahunajaran 	= $params['idtahunajaran'];
+	$idsekolah 		= $params['idsekolah'];
+
+	$datasiswa = $this->model_psep->fetch_siswa_by_kelasparalel_and_tahunajaran($idsekolah, $idkelasparalel, $idtahunajaran);
+
+	foreach($datasiswa as $siswa){
+		$this->model_kesiswaan->suspend_siswa($siswa->id_siswa);
+	}
+}
+
 }

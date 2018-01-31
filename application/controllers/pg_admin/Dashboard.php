@@ -27,6 +27,8 @@ class Dashboard extends CI_Controller {
 			redirect("pg_admin/quality/qc_dashboard");
 		}elseif($this->session->userdata('level') == "adminpa"){
 			redirect('pg_admin/pa');
+		}elseif($this->session->userdata('level') == "keuangan"){
+			redirect('pg_admin/keuangan/dashboard');
 		}else{
 			redirect('pg_admin/materi_urutan');
 		}

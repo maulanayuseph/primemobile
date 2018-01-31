@@ -13,6 +13,8 @@ class Cbt_event extends CI_Controller {
 		$this->load->model('model_pg');
 		$this->load->model('model_event');
 		$this->load->model('model_pembayaran');
+		$this->load->model('model_keuangan');
+		$this->load->library('PHPRequests');
   }
 
 
@@ -122,6 +124,15 @@ function aktivasi($idevent, $act){
 	//cek keaslian id event
 	$this->cek_event($idevent);
 
+	//cari tagihan berdasarkan event dan siswa
+	$cektagihan = $this->model_keuangan->fetch_tagihan_by_event_and_siswa($idevent, $this->session->userdata("id_siswa"));
+
+	if($cektagihan !== null){
+		$idpembelian = $cektagihan->id_pembelian;
+	}else{
+		$idpembelian = 0;
+	}
+
 	if($act == "buy"){
 		//user belum beli aktivasi event
 		//echo "beli dulu";
@@ -129,15 +140,15 @@ function aktivasi($idevent, $act){
 	}elseif($act == 0){
 		//user sudah beli tapi belum upload bukti transfer
 		//echo "bayar dulu";
-		redirect("cbt_event/buy_confirm/" . $idevent);
+		redirect("payment/tagihan_id/" . $idpembelian);
 	}elseif($act == 1){
 		//user sudah beli, sudah upload bukti transfer tapi belum di kofirm
 		//echo "tunggu konfirmasi ya";
-		redirect("cbt_event/waiting/" . $idevent);
+		redirect("payment/tagihan_id/" . $idpembelian);
 	}elseif($act == 2){
 		//komfirmasi selesai, suruh user melakukan input kode informasi
 		//echo "masukin kodenya";
-		redirect("cbt_event/activation/" . $idevent);
+		redirect("payment/tagihan_id/" . $idpembelian);
 	}elseif($act == 3){
 
 		redirect("cbt_event/buy_activation/" . $idevent);
@@ -164,7 +175,7 @@ function proses_beli($idevent){
 	$idpaket 			= 26;
 	$idsiswa 			= $this->session->userdata("id_siswa");
 	$now 				= new DateTime(null);
- 
+ 	$siswa 				= $this->model_dashboard->get_info_siswa($idsiswa);
 	//PERSIAPAN 1
 	$new_pembayaran = array(
 		"no_tagihan"				=> '', //no_tagihan set in model_event 
@@ -208,10 +219,75 @@ function proses_beli($idevent){
 	);
 	/* Data Pemebelian */
 	$result = $this->model_event->simpan($new_pembayaran, $detail_pembelian);
-	$this->send_invoice_event($result);
+	//$this->send_invoice_event($result);
 
+	/** PAYMENT GATEWAY DI HOLD DULU
+	$pembelian = $this->model_event->fetch_pembelian_by_id($result);
+	$dataxml = array(
+		'bookingid'			=> $result,
+		'clientid'			=> $idsiswa,
+		'customer_name'		=> substr($siswa->nama_siswa, 0, 25),
+		'amount'			=> $pembelian->total_harga,
+		'productid'			=> $idpaket,
+		'interval'			=> 1440,
+		'username'			=> username_tfp,
+		'booking_datetime'	=> $pembelian->timestamp,
+		'signature'			=> md5(username_tfp . password_tfp . $result)
+	);
+
+	$reqpaymentcode = $this->reqpaymentcode($dataxml);
+
+	$this->model_keuangan->insert_payment_tracking($result, $reqpaymentcode['type'], $reqpaymentcode['rawxml']);
+
+	if($reqpaymentcode['ack'] !== '00'){
+		$this->model_keuangan->delete_pembelian($result);
+		redirect('cbt_event/buy_activation/' . $idevent);
+	}else{
+		$insertvaid = $this->model_keuangan->edit_vaid($result, $reqpaymentcode['vaid']);
+		redirect("payment/tagihan_id/" . $result);
+	}
+	PAYMNET GATEWAY DI HOLD DULU
+	**/
 	redirect("user/bayar/" . $result);
 }
+
+function reqpaymentcode($dataxml){
+	$xml 	= '<?xml version="1.0"?>';
+	$xml 	.= '<data>';
+	$xml 	.= '<type>reqpaymentcode</type>';
+	$xml 	.= '<bookingid>' . $dataxml['bookingid'] .'</bookingid>';
+	$xml 	.= '<clientid>' . $dataxml['clientid'] .'</clientid>';
+	$xml 	.= '<customer_name>' . $dataxml['customer_name'] .'</customer_name>';
+	$xml 	.= '<amount>' . $dataxml['amount'] .'</amount>';
+	$xml 	.= '<productid>' . $dataxml['productid'] .'</productid>';
+	$xml 	.= '<interval>' . $dataxml['interval'] .'</interval>';
+	$xml 	.= '<username>' . $dataxml['username'] .'</username>';
+	$xml 	.= '<booking_datetime>' . $dataxml['booking_datetime'] .'</booking_datetime>';
+	$xml 	.= '<signature>' . $dataxml['signature'] .'</signature>';
+	$xml 	.= '</data>';
+
+	$this->model_keuangan->insert_payment_tracking($dataxml['bookingid'], 'reqpaymentcode', $xml);
+	$urlpost 	= url_reqpaymentcode;
+	$options	= array('timeout' => 60000);
+	$headers 	= array('Content-Type' => 'application/xml');
+	
+	$response 	= Requests::post($urlpost, $headers, $xml, $options);
+	//var_dump($response->body);
+	$xmlres 	= simplexml_load_string($response->body);
+
+	$data = array(
+		'rawxml'		=> $response->body,
+		'type'			=> (string)$xmlres->type,
+		'ack'			=> (string)$xmlres->ack,
+		'bookingid'		=> (string)$xmlres->bookingid,
+		'vaid'			=> (string)$xmlres->vaid,
+		'bankcode'		=> (string)$xmlres->bankcode,
+		'signature'		=> (string)$xmlres->signature
+	);
+
+	return $data;
+}
+
 
 
 function send_invoice_event($id_pembelian)

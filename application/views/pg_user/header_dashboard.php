@@ -68,7 +68,7 @@
 							}
 						?>
             <li>
-                <a href="<?php echo base_url("cbt_event/index/1");?>" style="color: red;">Event</a>
+                <a href="<?php echo base_url("cbt_event/index/2");?>" style="color: red;">Event</a>
             </li>
 					</ul>
 							

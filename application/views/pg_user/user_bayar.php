@@ -63,7 +63,7 @@
 
                   <?php
 
-                    if($buy->status == 0) { ?>  
+                    if($buy->status == )0 { ?>  
 
                       <label class="label label-warning">Belum Lunas</label>
 
@@ -188,7 +188,7 @@
 
 
 
-        <?php if($buy->status == 0) //belum lunas
+        <?php if($buy->status == 0 and $buy->vaid == "") //belum lunas
 
         { ?> 
 
@@ -227,6 +227,13 @@
         } ?>
 
         <hr>
+    <div class="col-sm-12">
+      <?php
+        if($buy->vaid !== "" and $buy->status == 0){
+          echo "tfp belum bayar";
+        }
+      ?>
+    </div>
 		<div class="col-sm-6" style="text-align: left;">
 			<div class="panel panel-default">
 				<div class="panel-heading">

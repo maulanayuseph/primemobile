@@ -165,34 +165,34 @@ function get_analisis_topik_2($idsiswa){
 // --
 
 function get_kelas_aktif($idsiswa, $tanggalsekarang){
-	$this->db->select("*");
+	$this->db->select("paket_aktif.id_siswa, paket_aktif.id_kelas, paket_aktif.id_paket, paket_aktif.kode_voucher, paket_aktif.timestamp, paket_aktif.expired_on, paket_aktif.isaktif, paket.kode_paket, paket.durasi, paket.tipe");
 	$this->db->from('paket_aktif');
-	$this->db->join('kelas', 'paket_aktif.id_kelas=kelas.id_kelas', 'left');
-	$this->db->join("paket", "paket_aktif.id_paket = paket.id_paket", "left");
+	$this->db->join('kelas', 'paket_aktif.id_kelas=kelas.id_kelas');
+	$this->db->join("paket", "paket_aktif.id_paket = paket.id_paket");
 	$this->db->where('id_siswa', $idsiswa);
 	$this->db->where("expired_on >=", $tanggalsekarang);
 	$this->db->where("paket.tipe", 0);
-	$this->db->limit(0,1);
+	$this->db->limit(1);
 	if($this->db->count_all_results() > 0){
-		$this->db->select("*");
+		$this->db->select("paket_aktif.id_siswa, paket_aktif.id_kelas, paket_aktif.id_paket, paket_aktif.kode_voucher, paket_aktif.timestamp, paket_aktif.expired_on, paket_aktif.isaktif, paket.kode_paket, paket.durasi, paket.tipe");
 		$this->db->from('paket_aktif');
-		$this->db->join('kelas', 'paket_aktif.id_kelas=kelas.id_kelas', 'left');
-		$this->db->join("paket", "paket_aktif.id_paket = paket.id_paket", "left");
+		$this->db->join('kelas', 'paket_aktif.id_kelas=kelas.id_kelas');
+		$this->db->join("paket", "paket_aktif.id_paket = paket.id_paket");
 		$this->db->where('id_siswa', $idsiswa);
 		$this->db->where("expired_on >=", $tanggalsekarang);
 		$this->db->where("paket.tipe", 0);
-		$this->db->limit(0,1);
+		$this->db->limit(1);
 
 		$query = $this->db->get();
 		return $query->row();
 	}else{
-		$this->db->select("*");
+		$this->db->select("paket_aktif.id_siswa, paket_aktif.id_kelas, paket_aktif.id_paket, paket_aktif.kode_voucher, paket_aktif.timestamp, paket_aktif.expired_on, paket_aktif.isaktif, paket.kode_paket, paket.durasi, paket.tipe");
 		$this->db->from('paket_aktif');
-		$this->db->join('kelas', 'paket_aktif.id_kelas=kelas.id_kelas', 'left');
-		$this->db->join("paket", "paket_aktif.id_paket = paket.id_paket", "left");
+		$this->db->join('kelas', 'paket_aktif.id_kelas=kelas.id_kelas');
+		$this->db->join("paket", "paket_aktif.id_paket = paket.id_paket");
 		$this->db->where('id_siswa', $idsiswa);
 		$this->db->where("expired_on >=", $tanggalsekarang);
-		$this->db->limit(0,1);
+		$this->db->limit(1);
 
 		$query = $this->db->get();
 		return $query->row();
@@ -229,6 +229,16 @@ function get_mapel_by_kelas($idkelas){
 	$this->db->from("mata_pelajaran");
 	$this->db->join("kelas", "mata_pelajaran.kelas_id=kelas.id_kelas", "left");
 	$this->db->where("kelas_id", $idkelas);
+	
+	$query = $this->db->get();
+	return $query->result();
+}
+
+function get_mapel_sbmptn(){
+	$this->db->select("*");
+	$this->db->from("mata_pelajaran");
+	$this->db->join("kelas", "mata_pelajaran.kelas_id=kelas.id_kelas", "left");
+	$this->db->where("kelas_id", 37)->or_where("kelas_id", 38);
 	
 	$query = $this->db->get();
 	return $query->result();
@@ -276,6 +286,15 @@ function cari_skor($idkategori, $idsiswa){
 	$this->db->where("id_kategori", $idkategori);
 	$this->db->where("id_siswa", $idsiswa);
 	$this->db->where("status", 1);
+	$result = $this->db->count_all_results();
+	return $result;
+}
+
+function cari_analisis_pelajaran($idkategori, $idsiswa){
+	$this->db->select("*");
+	$this->db->from("analisis_pelajaran");
+	$this->db->where("id_kategori", $idkategori);
+	$this->db->where("id_siswa", $idsiswa);
 	$result = $this->db->count_all_results();
 	return $result;
 }

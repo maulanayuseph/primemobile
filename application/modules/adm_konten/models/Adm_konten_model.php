@@ -348,5 +348,137 @@ function fetch_kurikulum_x_sub_bab_by_id($idkursub){
 	return $query->row();
 }
 
+function fetch_datakur_by_kursubbab($idkursub){
+	$this->db->select("*");
+	$this->db->from("kurikulum_x_sub_bab");
+	$this->db->join("kurikulum_x_kelas", "kurikulum_x_sub_bab.id_kurikulum_x_kelas = kurikulum_x_kelas.id_kurikulum_x_kelas", "left");
+	$this->db->join("sub_bab", "kurikulum_x_sub_bab.id_sub_bab = sub_bab.id_sub_bab", "left");
+	$this->db->join("bab", "sub_bab.id_bab = bab.id_bab", "left");
+	$this->db->join("mapel", "bab.id_mapel = mapel.id_mapel", "left");
+	$this->db->join("kelas", "kurikulum_x_kelas.id_kelas = kelas.id_kelas");
+	$this->db->join("kurikulum", "kurikulum_x_kelas.id_kurikulum = kurikulum.id_kurikulum", "left");
+	$this->db->where("id_kurikulum_x_sub_bab", $idkursub);
+
+	$query = $this->db->get();	
+	return $query->row();
+}
+
+function insert_judul($temamapel, $idkursub, $judul, $tipe){
+	$data = array(
+		'tema_or_mapel'		=> $temamapel,
+		'id_sub'			=> $idkursub,
+		'judul'				=> $judul,
+		'tipe'				=> $tipe
+	);
+	$this->db->insert("judul", $data);
+	$this->insert_id = $this->db->insert_id();
+	$insert_id = $this->insert_id;
+	return $insert_id;
+}
+
+function insert_materi($idjudul, $materi, $tanggal, $waktu, $idadm){
+	$data = array(
+		'id_judul'		=> $idjudul,
+		'isi_materi'	=> $materi,
+		'tanggal'		=> $tanggal,
+		'waktu'			=> $waktu,
+		'id_adm'		=> $idadm
+	);
+	$insert = $this->db->insert("konten_materi", $data);
+	if($insert){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+function fetch_materi_by_judul($idjudul){
+	$this->db->select("*");
+	$this->db->from("judul");
+	$this->db->join("konten_materi", "judul.id_judul = konten_materi.id_judul", "left");
+	$this->db->join("kurikulum_x_sub_bab", "judul.id_sub = kurikulum_x_sub_bab.id_kurikulum_x_sub_bab", "left");
+	$this->db->join("kurikulum_x_kelas", "kurikulum_x_sub_bab.id_kurikulum_x_kelas = kurikulum_x_kelas.id_kurikulum_x_kelas", "left");
+	$this->db->join("sub_bab", "kurikulum_x_sub_bab.id_sub_bab = sub_bab.id_sub_bab", "left");
+	$this->db->join("bab", "sub_bab.id_bab = bab.id_bab", "left");
+	$this->db->join("mapel", "bab.id_mapel = mapel.id_mapel", "left");
+	$this->db->join("kelas", "kurikulum_x_kelas.id_kelas = kelas.id_kelas");
+	$this->db->join("kurikulum", "kurikulum_x_kelas.id_kurikulum = kurikulum.id_kurikulum", "left");
+	$this->db->where("judul.id_judul", $idjudul);
+
+	$query = $this->db->get();	
+	return $query->row();
+}
+
+function edit_judul($idjudul, $judul){
+	$data = array(
+		'judul'		=> $judul
+	);
+	$this->db->where("id_judul", $idjudul);
+	$this->db->update("judul",$data);
+}
+
+function edit_materi($idkonten, $materi){
+	$data = array(
+		'isi_materi' => $materi
+	);
+	$this->db->where("id_konten", $idkonten);
+	$update = $this->db->update("konten_materi", $data);
+	if($update){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+function fetch_author_materi($idjudul){
+	$this->db->select("*");
+	$this->db->from("judul");
+	$this->db->join("konten_materi", "judul.id_judul = konten_materi.id_judul", "left");
+	$this->db->join("login_adm", "konten_materi.id_adm = login_adm.id_adm");
+	$this->db->where("konten_materi.id_judul", $idjudul);
+
+	$query = $this->db->get();	
+	return $query->row();
+}
+
+function fetch_parent_group(){
+	$this->db->select("*");
+	$this->db->from("group");
+	$this->db->where("parent", 0);
+
+	$query = $this->db->get();	
+	return $query->result();
+}
+
+function hitung_child_group($idgroup){
+	$this->db->select("*");
+	$this->db->from("group");
+	$this->db->where("parent", $idgroup);
+
+	$result = $this->db->count_all_results();
+	return $result;
+}
+
+function fetch_group_by_parent($idgroup){
+	$this->db->select("*");
+	$this->db->from("group");
+	$this->db->where("parent", $idgroup);
+
+	$query = $this->db->get();	
+	return $query->result();
+}
+
+function fetch_all_indikator(){
+	$this->db->select("*");
+	$this->db->from("indikator");
+	$this->db->join("kurikulum_x_mapel", "indikator.id_kurikulum_x_mapel = kurikulum_x_mapel.id_kurikulum_x_mapel");
+	$this->db->join("kurikulum_x_kelas", "kurikulum_x_mapel.id_kurikulum_x_kelas = kurikulum_x_kelas.id_kurikulum_x_mapel");
+	$this->db->join("kelas", "kurikulum_x_kelas.id_kelas = kelas.id_kelas");
+	$this->db->join("kurikulum", "kurikulum_x_kelas.id_kurikulum = kurikulum.id_kurikulum", "left");
+	
+	$query = $this->db->get();	
+	return $query->result();
+}
+
 }
 ?>

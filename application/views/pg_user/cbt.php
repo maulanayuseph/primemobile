@@ -126,6 +126,7 @@ include('header_dashboard.php');
 																$cariskor 		= $this->model_dashboard->cari_skor($tryout->id_kategori, $idsiswa);
 																$cariskorsalah 	= $this->model_dashboard->cari_skor_salah($tryout->id_kategori, $idsiswa);
 																$cariwaktu 		= $this->model_dashboard->cari_waktu($tryout->id_kategori, $idsiswa);
+																$caripel 		= $this->model_dashboard->cari_analisis_pelajaran($tryout->id_kategori, $idsiswa);
 																
 																$prosentase = round(($cariskor/$tryout->jumlah_soal) * 100, 2);
 																
@@ -158,7 +159,7 @@ include('header_dashboard.php');
 															?>
 															</div>
 														 <?php
-															if(($cariskor > 0 or $cariskorsalah > 0) and $cariwaktu > 0){
+															if($caripel > 0){
 															?>
 																<div class="progress" style="height: 10px;">
 																<div class="progress-bar" role="progressbar" aria-valuenow="<?php echo $prosentase;?>" aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $prosentase;?>%;">
@@ -456,7 +457,7 @@ include('header_dashboard.php');
 																$cariskor 		= $this->model_dashboard->cari_skor($tryout->id_kategori, $idsiswa);
 																$cariskorsalah 	= $this->model_dashboard->cari_skor_salah($tryout->id_kategori, $idsiswa);
 																$cariwaktu 		= $this->model_dashboard->cari_waktu($tryout->id_kategori, $idsiswa);
-																
+																$caripel 		= $this->model_dashboard->cari_analisis_pelajaran($tryout->id_kategori, $idsiswa);
 																$prosentase = round(($cariskor/$tryout->jumlah_soal) * 100, 2);
 																
 																if($cariskor > 0 and $cariwaktu > 0){
@@ -488,7 +489,7 @@ include('header_dashboard.php');
 															?>
 															</div>
 														 <?php
-															if(($cariskor > 0 or $cariskorsalah > 0) and $cariwaktu > 0){
+															if($caripel > 0){
 															?>
 																<div class="progress" style="height: 10px;">
 																<div class="progress-bar" role="progressbar" aria-valuenow="<?php echo $prosentase;?>" aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $prosentase;?>%;">

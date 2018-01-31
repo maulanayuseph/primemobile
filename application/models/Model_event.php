@@ -189,4 +189,15 @@ function fetch_peringkat_regional_sma_ips(){
 	$result = $this->db->get();
 	return $result->result();
 }
+
+//update untuk tfp
+function fetch_pembelian_by_id($idpembelian){
+	$this->db->select("*");
+	$this->db->from("pembelian");
+	$this->db->where("id_pembelian", $idpembelian);
+
+	$result = $this->db->get();
+	return $result->row();
+}
+//end update tfp
 }

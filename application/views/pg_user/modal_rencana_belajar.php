@@ -130,6 +130,63 @@
 											}
 										}
 									?>
+
+									<!-- SBMPTN -->
+									<?php
+										if($datasbmptn !== null){
+											?>
+											<div class="panel panel-default">
+												<div class="panel-heading">
+													<h4>Prediksi dan Pembahasan SBMPTN</h4>
+												</div>
+											</div>
+											<?php
+											foreach($datasbmptn as $mapel){
+												?>
+												<div class="panel panel-default panel-mapel-kiri" href="#bab<?php echo $mapel->id_mapel;?>" aria-controls="bab<?php echo $mapel->id_mapel;?>" role="tab" data-toggle="tab">
+													<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse<?php echo $mapel->id_mapel;?>" aria-expanded="false" aria-controls="collapse<?php echo $mapel->id_mapel;?>">
+														<div class="panel-heading" role="tab">
+														  <h4 class="panel-title">
+															  <?php echo $mapel->nama_mapel;?>
+														  </h4>
+														</div>
+													</a>
+													<ul id="collapse<?php echo $mapel->id_mapel;?>" class="panel-collapse collapse hidden-sm hidden-md hidden-lg ul-panel-kiri-bab">
+														<?php
+															$carimapok 	= $this->model_materi_urutan->cari_mapok_by_mapel($mapel->id_mapel);
+															
+															foreach($carimapok as $mapok){
+																$jumlahsubk13 = $this->model_kurikulum->jumlah_subk13_by_mapok($mapok->id_materi_pokok);
+																$jumlahsubirisan = $this->model_kurikulum->jumlah_subkirisan_by_mapok($mapok->id_materi_pokok);
+																if($jumlahsubk13 > 0 or $jumlahsubirisan > 0){
+																	
+																	//lakukan pengecekan apakah user sudah menyimpan bab di rencana belajar, jika sudah, pake class warna merah
+																	$cekrencana['k13'][$mapok->id_materi_pokok] = $this->model_rencana_belajar->cek_rencana("k13", $mapok->id_materi_pokok);
+																	
+																	if($cekrencana['k13'][$mapok->id_materi_pokok] > 0){
+																		//echo $cekrencana['k13'][$mapok->id_materi_pokok];
+																		?>
+																		<li id="k13-accor-<?php echo $mapok->id_materi_pokok;?>" role="button" class="list-group-item unselect_bab_k13">
+																		<span class="glyphicon glyphicon-ok" id="ok-kiri-k13-<?php echo $mapok->id_materi_pokok;?>" aria-hidden="true"></span> <?php echo $mapok->judul_bab_k13;?>
+																		</li>
+																		<?php
+																	}else{
+																		?>
+																		<li id="k13-accor-<?php echo $mapok->id_materi_pokok;?>" role="button" class="list-group-item select_bab_k13">
+																		<?php echo $mapok->judul_bab_k13;?>
+																		</li>
+																		<?php
+																	}
+																}
+															}
+														?>
+													</ul>
+												  </div>
+												<?php
+											}
+										}
+									?>
+									<!-- END SBMPTN -->
 								</div>
 							</div>
 							<div class="col-md-8 hidden-xs kolom-bab-rencana">
@@ -142,6 +199,13 @@
 										};
 										if($kelasaktif->id_kelas == 6 or $kelasaktif->id_kelas == 9 or $kelasaktif->id_kelas == 19 or $kelasaktif->id_kelas == 20){
 											foreach($datamapelun as $mapel){
+												?>
+												<li role="presentation"><a href="#bab<?php echo $mapel->id_mapel;?>" aria-controls="bab<?php echo $mapel->id_mapel;?>" role="tab" data-toggle="tab" id="tabbab-btn<?php echo $mapel->id_mapel;?>">Settings</a></li>
+												<?php
+											}
+										}
+										if($datasbmptn !== null){
+											foreach($datasbmptn as $mapel){
 												?>
 												<li role="presentation"><a href="#bab<?php echo $mapel->id_mapel;?>" aria-controls="bab<?php echo $mapel->id_mapel;?>" role="tab" data-toggle="tab" id="tabbab-btn<?php echo $mapel->id_mapel;?>">Settings</a></li>
 												<?php
@@ -187,6 +251,42 @@
 									};
 									if($kelasaktif->id_kelas == 6 or $kelasaktif->id_kelas == 9 or $kelasaktif->id_kelas == 19 or $kelasaktif->id_kelas == 20){
 										foreach($datamapelun as $mapel){
+											?>
+												<div role="tabpanel" class="tab-pane fade" id="bab<?php echo $mapel->id_mapel;?>">
+													<?php
+														$carimapok 	= $this->model_materi_urutan->cari_mapok_by_mapel($mapel->id_mapel);
+														
+														$e = 1;
+														foreach($carimapok as $mapok){
+															$jumlahsubk13 = $this->model_kurikulum->jumlah_subk13_by_mapok($mapok->id_materi_pokok);
+															$jumlahsubirisan = $this->model_kurikulum->jumlah_subkirisan_by_mapok($mapok->id_materi_pokok);
+															if($jumlahsubk13 > 0 or $jumlahsubirisan > 0){
+																if($cekrencana['k13'][$mapok->id_materi_pokok] > 0){
+																	?>
+																	<div role="button" class="panel panel-default panel-bab-kanan pilih-bab ul-panel-kanan-bab">
+																		<div class="panel-body unselect_bab_k13" id="k13-panel-<?php echo $mapok->id_materi_pokok;?>">
+																			<span class="glyphicon glyphicon-ok" id="ok-kanan-k13-<?php echo $mapok->id_materi_pokok;?>" aria-hidden="true"></span> <?php echo $mapok->judul_bab_k13;?>
+																		</div>
+																	</div>
+																	<?php
+																}else{
+																	?>
+																	<div role="button" class="panel panel-default panel-bab-kanan pilih-bab ul-panel-kanan-bab">
+																		<div class="panel-body select_bab_k13" id="k13-panel-<?php echo $mapok->id_materi_pokok;?>"><?php echo $mapok->judul_bab_k13;?>
+																		</div>
+																	</div>
+																	<?php
+																}
+															}
+															$e++;
+														}
+													?>
+												</div>
+											<?php
+										}
+									}
+									if($datasbmptn !== null){
+										foreach($datasbmptn as $mapel){
 											?>
 												<div role="tabpanel" class="tab-pane fade" id="bab<?php echo $mapel->id_mapel;?>">
 													<?php
@@ -337,6 +437,57 @@
 												<?php
 											}
 										}
+										if($datasbmptn !== null){
+											?>
+											<div class="panel panel-default">
+												<div class="panel-heading">
+													<h4>Prediksi dan Pembahasan SBMPTN</h4>
+												</div>
+											</div>
+											<?php
+											foreach($datasbmptn as $mapel){
+												?>
+												<div class="panel panel-default panel-mapel-kiri" href="#babktsp<?php echo $mapel->id_mapel;?>" aria-controls="babktsp<?php echo $mapel->id_mapel;?>" role="tab" data-toggle="tab">
+													<a role="button" data-toggle="collapse" data-parent="#accordionktsp" href="#collapsektsp<?php echo $mapel->id_mapel;?>" aria-expanded="false" aria-controls="collapse<?php echo $mapel->id_mapel;?>">
+														<div class="panel-heading" role="tab">
+														  <h4 class="panel-title">
+															  <?php echo $mapel->nama_mapel;?>
+														  </h4>
+														</div>
+													</a>
+													<ul id="collapsektsp<?php echo $mapel->id_mapel;?>" class="panel-collapse collapse hidden-sm hidden-md hidden-lg ul-panel-kiri-bab">
+														<?php
+															$carimapok 	= $this->model_materi_urutan->cari_mapok_by_mapel($mapel->id_mapel);
+															
+															foreach($carimapok as $mapok){
+																$jumlahsubktsp = $this->model_kurikulum->jumlah_ktsp_by_mapok($mapok->id_materi_pokok);
+																$jumlahsubirisan = $this->model_kurikulum->jumlah_subkirisan_by_mapok($mapok->id_materi_pokok);
+																if($jumlahsubktsp > 0 or $jumlahsubirisan > 0){
+																	
+																	$cekrencana['ktsp'][$mapok->id_materi_pokok] = $this->model_rencana_belajar->cek_rencana("ktsp", $mapok->id_materi_pokok);
+																	
+																	if($cekrencana['ktsp'][$mapok->id_materi_pokok] > 0){
+																		//echo $cekrencana['k13'][$mapok->id_materi_pokok];
+																		?>
+																		<li id="ktsp-accor-<?php echo $mapok->id_materi_pokok;?>" role="button" class="list-group-item unselect_bab_k13">
+																		<span class="glyphicon glyphicon-ok" id="ok-kiri-ktsp-<?php echo $mapok->id_materi_pokok;?>" aria-hidden="true"></span> <?php echo $mapok->judul_bab_ktsp;?>
+																		</li>
+																		<?php
+																	}else{
+																		?>
+																		<li id="ktsp-accor-<?php echo $mapok->id_materi_pokok;?>" role="button" class="list-group-item select_bab_k13">
+																		<?php echo $mapok->judul_bab_ktsp;?>
+																		</li>
+																		<?php
+																	}
+																}
+															}
+														?>
+													</ul>
+												  </div>
+												<?php
+											}
+										}
 									?>
 								  
 								</div>
@@ -351,6 +502,13 @@
 										};
 										if($kelasaktif->id_kelas == 6 or $kelasaktif->id_kelas == 9 or $kelasaktif->id_kelas == 19 or $kelasaktif->id_kelas == 20){
 											foreach($datamapelun as $mapel){
+												?>
+												<li role="presentation"><a href="#bab<?php echo $mapel->id_mapel;?>" aria-controls="bab<?php echo $mapel->id_mapel;?>" role="tab" data-toggle="tab" id="tabbab-btn<?php echo $mapel->id_mapel;?>">Settings</a></li>
+												<?php
+											}
+										}
+										if($datasbmptn !== null){
+											foreach($datasbmptn as $mapel){
 												?>
 												<li role="presentation"><a href="#bab<?php echo $mapel->id_mapel;?>" aria-controls="bab<?php echo $mapel->id_mapel;?>" role="tab" data-toggle="tab" id="tabbab-btn<?php echo $mapel->id_mapel;?>">Settings</a></li>
 												<?php
@@ -394,6 +552,40 @@
 									};
 									if($kelasaktif->id_kelas == 6 or $kelasaktif->id_kelas == 9 or $kelasaktif->id_kelas == 19 or $kelasaktif->id_kelas == 20){
 										foreach($datamapelun as $mapel){
+											?>
+												<div role="tabpanel" class="tab-pane fade" id="babktsp<?php echo $mapel->id_mapel;?>">
+													<?php
+														$carimapok 	= $this->model_materi_urutan->cari_mapok_by_mapel($mapel->id_mapel);
+														
+														foreach($carimapok as $mapok){
+															$jumlahsubktsp = $this->model_kurikulum->jumlah_ktsp_by_mapok($mapok->id_materi_pokok);
+															$jumlahsubirisan = $this->model_kurikulum->jumlah_subkirisan_by_mapok($mapok->id_materi_pokok);
+															if($jumlahsubktsp > 0 or $jumlahsubirisan > 0){
+																if($cekrencana['ktsp'][$mapok->id_materi_pokok] > 0){
+																	?>
+																	<div role="button" class="panel panel-default panel-bab-kanan pilih-bab ul-panel-kanan-bab">
+																		<div class="panel-body unselect_bab_k13" id="ktsp-panel-<?php echo $mapok->id_materi_pokok;?>">
+																			<span class="glyphicon glyphicon-ok" id="ok-kanan-k13-<?php echo $mapok->id_materi_pokok;?>" aria-hidden="true"></span> <?php echo $mapok->judul_bab_ktsp;?>
+																		</div>
+																	</div>
+																	<?php
+																}else{
+																	?>
+																	<div role="button" class="panel panel-default panel-bab-kanan pilih-bab ul-panel-kanan-bab">
+																		<div class="panel-body select_bab_k13" id="ktsp-panel-<?php echo $mapok->id_materi_pokok;?>"><?php echo $mapok->judul_bab_ktsp;?>
+																		</div>
+																	</div>
+																	<?php
+																}
+															}
+														}
+													?>
+												</div>
+											<?php
+										}
+									}
+									if($datasbmptn !== null){
+										foreach($datasbmptn as $mapel){
 											?>
 												<div role="tabpanel" class="tab-pane fade" id="babktsp<?php echo $mapel->id_mapel;?>">
 													<?php
@@ -546,6 +738,57 @@
 												<?php
 											}
 										}
+										if($datasbmptn !== null){
+											?>
+											<div class="panel panel-default">
+												<div class="panel-heading">
+													<h4>Prediksi dan Pembahasan SBMPTN</h4>
+												</div>
+											</div>
+											<?php
+											foreach($datasbmptn as $mapel){
+												?>
+												<div class="panel panel-default panel-mapel-kiri" href="#babk13rev<?php echo $mapel->id_mapel;?>" aria-controls="bab<?php echo $mapel->id_mapel;?>" role="tab" data-toggle="tab">
+													<a role="button" data-toggle="collapse" data-parent="#accordionk13rev" href="#collapsek13rev<?php echo $mapel->id_mapel;?>" aria-expanded="false" aria-controls="collapse<?php echo $mapel->id_mapel;?>">
+														<div class="panel-heading" role="tab">
+														  <h4 class="panel-title">
+															  <?php echo $mapel->nama_mapel;?>
+														  </h4>
+														</div>
+													</a>
+													<ul id="collapsek13rev<?php echo $mapel->id_mapel;?>" class="panel-collapse collapse hidden-sm hidden-md hidden-lg ul-panel-kiri-bab">
+														<?php
+															$carimapok 	= $this->model_materi_urutan->cari_mapok_by_mapel($mapel->id_mapel);
+															
+															foreach($carimapok as $mapok){
+																$jumlahsubk13rev = $this->model_kurikulum->jumlah_subk13rev_by_mapok($mapok->id_materi_pokok);
+																if($jumlahsubk13rev > 0){
+																	
+																	//lakukan pengecekan apakah user sudah menyimpan bab di rencana belajar, jika sudah, pake class warna merah
+																	$cekrencana['k13rev'][$mapok->id_materi_pokok] = $this->model_rencana_belajar->cek_rencana("K-13 REVISI", $mapok->id_materi_pokok);
+																	
+																	if($cekrencana['k13rev'][$mapok->id_materi_pokok] > 0){
+																		//echo $cekrencana['k13'][$mapok->id_materi_pokok];
+																		?>
+																		<li id="k13rev-accor-<?php echo $mapok->id_materi_pokok;?>" role="button" class="list-group-item unselect_bab_k13">
+																		<span class="glyphicon glyphicon-ok" id="ok-kiri-k13-<?php echo $mapok->id_materi_pokok;?>" aria-hidden="true"></span> <?php echo $mapok->judul_bab_k13;?>
+																		</li>
+																		<?php
+																	}else{
+																		?>
+																		<li id="k13rev-accor-<?php echo $mapok->id_materi_pokok;?>" role="button" class="list-group-item select_bab_k13">
+																		<?php echo $mapok->judul_bab_k13;?>
+																		</li>
+																		<?php
+																	}
+																}
+															}
+														?>
+													</ul>
+												  </div>
+												<?php
+											}
+										}
 									?>
 
 									
@@ -573,6 +816,22 @@
 											}
 										}
 										//END MAPEL UNTUK PEMBAHASAN US/M SD
+										//##############################
+										//##############################
+										//##############################
+
+										//MAPEL UNTUK SBMPTN
+										//##############################
+										//##############################
+										//##############################
+										if($datasbmptn !== null){
+											foreach($datasbmptn as $mapel){
+												?>
+												<li role="presentation"><a href="#babk13rev<?php echo $mapel->id_mapel;?>" aria-controls="babk13rev<?php echo $mapel->id_mapel;?>" role="tab" data-toggle="tab" id="tabbab-btn<?php echo $mapel->id_mapel;?>">Settings</a></li>
+												<?php
+											}
+										}
+										//END MAPEL UNTUK SBMPTN
 										//##############################
 										//##############################
 										//##############################
@@ -615,6 +874,42 @@
 									};
 									if($kelasaktif->id_kelas == 6 or $kelasaktif->id_kelas == 9 or $kelasaktif->id_kelas == 19 or $kelasaktif->id_kelas == 20){
 										foreach($datamapelun as $mapel){
+											?>
+												<div role="tabpanel" class="tab-pane fade" id="babk13rev<?php echo $mapel->id_mapel;?>">
+													<?php
+														$carimapok 	= $this->model_materi_urutan->cari_mapok_by_mapel($mapel->id_mapel);
+														
+														$e = 1;
+														foreach($carimapok as $mapok){
+															$jumlahsubk13rev = $this->model_kurikulum->jumlah_subk13rev_by_mapok($mapok->id_materi_pokok);
+															if($jumlahsubk13rev > 0){
+																if($cekrencana['k13rev'][$mapok->id_materi_pokok] > 0){
+																	?>
+																	<div role="button" class="panel panel-default panel-bab-kanan pilih-bab ul-panel-kanan-bab">
+																		<div class="panel-body unselect_bab_k13" id="k13rev-panel-<?php echo $mapok->id_materi_pokok;?>">
+																			<span class="glyphicon glyphicon-ok" id="ok-kanan-k13-<?php echo $mapok->id_materi_pokok;?>" aria-hidden="true"></span> <?php echo $mapok->judul_bab_k13;?>
+																		</div>
+																	</div>
+																	<?php
+																}else{
+																	?>
+																	<div role="button" class="panel panel-default panel-bab-kanan pilih-bab ul-panel-kanan-bab">
+																		<div class="panel-body select_bab_k13" id="k13rev-panel-<?php echo $mapok->id_materi_pokok;?>"><?php echo $mapok->judul_bab_k13;?>
+																		</div>
+																	</div>
+																	<?php
+																}
+															}
+															$e++;
+														}
+													?>
+												</div>
+											<?php
+										}
+									}
+
+									if($datasbmptn!== null){
+										foreach($datasbmptn as $mapel){
 											?>
 												<div role="tabpanel" class="tab-pane fade" id="babk13rev<?php echo $mapel->id_mapel;?>">
 													<?php

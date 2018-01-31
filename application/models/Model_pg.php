@@ -844,7 +844,7 @@ function fetch_aktivasi_siswa($idsiswa){
 	$this->db->select("*");
 	$this->db->from("paket_aktif");
 	$this->db->where("id_siswa", $idsiswa);
-	$this->db->limit(0,1); //limit 1 hasil
+	$this->db->limit(1); //limit 1 hasil
 	$this->db->order_by("paket_aktif.id_paket_aktif", "ASC"); //pilih paket aktif yang terbaru
 	// echo $this->db->_compile_select();
 	$query = $this->db->get();

@@ -19,8 +19,8 @@ function fetch_kelas_paralel_12($idsekolah){
 	$this->db->from("kelas_paralel");
 	$this->db->join("kelas", "kelas_paralel.id_kelas = kelas.id_kelas", "left");
 	$this->db->join("sekolah", "kelas_paralel.id_sekolah = sekolah.id_sekolah", "left");
-	$this->db->where("sekolah.id_sekolah", $idsekolah);
-	$this->db->where("kelas_paralel.id_kelas", 19)->or_where("kelas_paralel.id_kelas", 20);
+	$this->db->where("kelas_paralel.id_sekolah", $idsekolah);
+	$this->db->where("(kelas_paralel.id_kelas = 19 or kelas_paralel.id_kelas = 20)");
 
 	$query = $this->db->get();
 	return $query->result();

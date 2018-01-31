@@ -120,6 +120,7 @@
 					<li><span class="circle-icon"></span>&nbsp;</li>
 					<li><span id="time">00:00</span></li>
 					<li><button type="submit" name="submit_form_soal" id="submit_form_soal" value="submit" onclick="return confirm('Apakah anda yakin untuk menyelesaikan tes?')" style="color: black;">Selesaikan Tes</button></li>
+					<li><button type="submit" name="submit_form_soal" id="submit_form_soal_force" value="submit" style="color: black; display: none;" >Selesaikan Tes</button></li>
 				</ul></div>
 			</div>
 
@@ -882,6 +883,23 @@
     	}
 
     </script>
+
+<script src="https://www.gstatic.com/firebasejs/4.9.0/firebase.js"></script>
+<script>
+// Initialize Firebase
+var config = {
+  apiKey: "AIzaSyCy6BjwXzz92ob2uzaq9PauFN03kKmAbqM",
+  authDomain: "prime-mobile-fc14d.firebaseapp.com",
+  databaseURL: "https://prime-mobile-fc14d.firebaseio.com",
+  projectId: "prime-mobile-fc14d",
+  storageBucket: "prime-mobile-fc14d.appspot.com",
+  messagingSenderId: "787216888776"
+};
+firebase.initializeApp(config);
+
+
+</script>
+
 <?php
 
 if(isset($elapsed_time)){
@@ -894,6 +912,9 @@ if(isset($elapsed_time)){
 ?>
 
 <script>
+
+
+
 function startTimer(duration, display) {
     var timer = duration, minutes, seconds;
     setInterval(function () {
@@ -912,33 +933,71 @@ function startTimer(duration, display) {
 }
 
 window.onload = function () {
-    var fiveMinutes = 60 * <?php echo $waktu; ?>,
-    display = document.querySelector('#time');
-    startTimer(fiveMinutes, display);
-	
-	setInterval(function () {document.getElementById("submit_form_soal").click();}, <?php echo $timer;?>);
-	
-	//COUNT UUUUUUUUUUP
-	var timerVar = setInterval(countTimer, 1000);
+	var firebaseElapsed = firebase.database().ref().child('elapsed_time/siswa_' + <?php echo $this->session->userdata("id_siswa");?> + '/' + <?php echo $infotryout->id_kategori ;?> + '/elapsed_time');
 
-	<?php
-	if(isset($elapsed_time)){
-		$countdetik = (round($elapsed_time->elapsed_time) * 60)-1;
-		echo "var totalSeconds = ".$countdetik.";";
-	}else{
-		echo "var totalSeconds = -1;";
-	}
-	?>
+	firebaseElapsed.once('value', function(datasnapshot){
+		console.log(datasnapshot);
+		if(datasnapshot.val() === null){
+			var firebaseRef   = firebase.database().ref();
+			firebaseRef.child('elapsed_time/siswa_' + <?php echo $this->session->userdata("id_siswa");?> + '/' + <?php echo $infotryout->id_kategori ;?> + '/elapsed_time').set(0);
+			var elapsed 	= 0;
+			var durasi 		= parseInt(<?php echo $durasi->durasi;?>);
+			var penghitung 	= parseInt(durasi * 1000);
+		}else{
+			//$("#heading").html(datasnapshot.val());
+			var elapsed 	= parseInt(datasnapshot.val());
+			var durasi 		= parseInt(<?php echo $durasi->durasi;?>) - parseInt(datasnapshot.val());
+			var penghitung 	= parseInt(durasi * 1000);
+		}
+		var fiveMinutes = durasi,
+	    display = document.querySelector('#time');
+	    startTimer(fiveMinutes, display);
+		
+		setInterval(function () {document.getElementById("submit_form_soal_force").click();}, penghitung);
+		
+		//COUNT UUUUUUUUUUP
+		var timerVar = setInterval(countTimer, 1000);
 
-	function countTimer() {
-	++totalSeconds;
-	var hour = Math.floor(totalSeconds /3600);
-	var minute = Math.floor((totalSeconds - hour*3600)/60);
-	var seconds = totalSeconds - (hour*3600 + minute*60);
+		if(elapsed > 0){
+			var totalSeconds = (elapsed * 60) - 1;
+		}else{
+			var totalSeconds = -1;
+		}
+		<?php
+		/*
+		if(isset($elapsed_time)){
+			$countdetik = (round($elapsed_time->elapsed_time) * 60)-1;
+			echo "var totalSeconds = ".$countdetik.";";
+		}else{
+			echo "var totalSeconds = -1;";
+		}
+		*/
+		?>
 
-	document.getElementById("stopwatch").innerHTML = hour + ":" + minute + ":" + seconds;
-	}
-	// END COUNT UUUUUUUUUUP
+		function countTimer() {
+		++totalSeconds;
+		var hour = Math.floor(totalSeconds /3600);
+		var minute = Math.floor((totalSeconds - hour*3600)/60);
+		var seconds = totalSeconds - (hour*3600 + minute*60);
+
+		var firebaseElapsed = firebase.database().ref().child('elapsed_time/siswa_' + <?php echo $this->session->userdata("id_siswa");?> + '/' + <?php echo $infotryout->id_kategori ;?> + '/elapsed_time');
+		firebaseElapsed.once('value', function(datasnapshot){
+			console.log(datasnapshot);
+			if(datasnapshot.val() === null){
+				var firebaseRef   = firebase.database().ref();
+				firebaseRef.child('elapsed_time/siswa_' + <?php echo $this->session->userdata("id_siswa");?> + '/' + <?php echo $infotryout->id_kategori ;?> + '/elapsed_time').set(0);
+			}else{
+				elapsed = parseInt(datasnapshot.val()) + 1;
+				var firebaseRef   = firebase.database().ref();
+				firebaseRef.child('elapsed_time/siswa_' + <?php echo $this->session->userdata("id_siswa");?> + '/' + <?php echo $infotryout->id_kategori ;?> + '/elapsed_time').set(elapsed);
+				//$("#heading").html(datasnapshot.val());
+			}
+		})
+
+		document.getElementById("stopwatch").innerHTML = hour + ":" + minute + ":" + seconds;
+		}
+		// END COUNT UUUUUUUUUUP
+	})
 };
 </script>
 
@@ -1000,7 +1059,7 @@ $no++;
 		$(".se-pre-con").fadeOut("slow");
 		setInterval(function () {
 			$(function(){
-				$("#simpanwaktu").load("../simpanwaktu/");
+				//$("#simpanwaktu").load("../simpanwaktu/");
 			});
 		}, 1000);
 	});
