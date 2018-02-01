@@ -27,7 +27,7 @@ if ( function_exists( 'date_default_timezone_set' ) ) {
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = 'http://'.$_SERVER['SERVER_NAME'].'/newpm';
+$config['base_url'] = 'http://'.$_SERVER['SERVER_NAME'].'/primemobile';
 
 /*
 |--------------------------------------------------------------------------
